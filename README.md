@@ -54,7 +54,7 @@ are the desired width and height of the output level.
 Add a function inside repair.py with the following format:
 
 ```
-def repair_name_here(level, game, width, height):
+def repair_name_here(level, game):
     # ...
 ```
 
