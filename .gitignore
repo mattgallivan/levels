@@ -1,3 +1,14 @@
+# Output folder contents ignored 
+#   except immediate markdown files
+output/*
+!output/*.md
+
+.vscode/
+
+# Ignore this metafile that's created more 
+# for debugging.
+output_meta.json
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
