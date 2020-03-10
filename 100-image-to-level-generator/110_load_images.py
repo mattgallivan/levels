@@ -1,7 +1,5 @@
-import numpy as np
 import cv2
 import os
-import time
 
 
 def get_list_of_images_to_load(opts = None):
@@ -37,6 +35,6 @@ def get_list_of_images_to_load(opts = None):
 
 def extract_image_data_into_object(opts):
     output = {}
-    output['opencv'] = cv2.cvtColor(cv2.imread(opts['full_filename']), cv2.COLOR_BGR2RGB) 
+    output['opencv'] = cv2.imread(opts['full_filename']) #cv2.cvtColor(cv2.imread(opts['full_filename']), cv2.COLOR_BGR2RGB) 
     return output
 

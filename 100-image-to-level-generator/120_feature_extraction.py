@@ -5,35 +5,49 @@ from pathlib import Path
 def extract_features(img_meta, opts = None):
     
     output = {}
-    output['img_in_tiles_by_size'] = turn_into_tiles(img_meta['raw_img_data']['opencv'])
-
+    output['img_for_tile_by_tilesize'] = turn_into_tiles(img_meta['raw_img_data']['opencv'])
+    output['histogram_for_tile_by_tilesize'] = turn_tiles_into_histogram(output['img_for_tile_by_tilesize'])
     save_tiles_as_images_for_debugging(output, img_meta)
 
     return output
 
+def turn_tiles_into_histogram(img_for_tile_by_tilesize):
+
+    histogram_for_tile_by_tilesize = {}
+
+    for tile_size in img_for_tile_by_tilesize:
+        histogram_for_tile_by_tilesize[tile_size] = []
+        for row_of_tiles in img_for_tile_by_tilesize[tile_size]:
+            row = []
+            for image in row_of_tiles:
+                row.append(get_histogram_of_image(image))
+            histogram_for_tile_by_tilesize[tile_size].append(row) 
+    return histogram_for_tile_by_tilesize
+
+
+def get_histogram_of_image(image):
+    histogram = cv2.calcHist(image, [0,1,2], None, [8,8,8],
+		                [0,256,0,256,0,256])
+    histogram = cv2.normalize(histogram, histogram).flatten()
+    return histogram
+
 
 def save_tiles_as_images_for_debugging(output, img_meta):
 
-    output_base_path = "./output/"
-    output_path = output_base_path + img_meta["file_info"]["addition_from_start_path"]
-
-    if (img_meta["file_info"]["addition_from_start_path"] != ""):
-        output_path += "/"
-
-    output_path += img_meta["file_info"]["filename"] + "/"
-    output_path += "tiles/"
+    output_path = img_meta["output_info"]["output_path"] + "tiles/"
 
     # Make the output path first if it doesn't exist.
     Path(output_path).mkdir(parents=True, exist_ok=True)
 
     # Write the tiles as images!
-    for tile_size in output['img_in_tiles_by_size']:
-        r,c = 0,0
-        for row_of_tiles in output['img_in_tiles_by_size'][tile_size]:
+    for tile_size in output['img_for_tile_by_tilesize']:
+        r = 0
+        for row_of_tiles in output['img_for_tile_by_tilesize'][tile_size]:
+            c = 0
             for tile in row_of_tiles:
                 cv2.imwrite( output_path + str(tile_size) 
                         + "_" + str(r) + "x" 
-                        + str(c) + ".png", cv2.cvtColor(tile, cv2.COLOR_RGB2BGR) )
+                        + str(c) + ".png", tile) #cv2.cvtColor(tile, cv2.COLOR_RGB2BGR)
                 c += 1
             r += 1
 
@@ -43,7 +57,7 @@ def turn_into_tiles(opencv_img, opts = None):
 
     if opts is None:
         opts = {
-            "tile_sizes": [16, 32, 100]
+            "tile_sizes": [16, 32, 50]
         }
 
     (r_max, c_max, rgb_max) = opencv_img.shape

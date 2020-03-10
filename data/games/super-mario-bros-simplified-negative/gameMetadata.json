@@ -1,7 +1,7 @@
 {
 	"game_info": {
-		"shortname": "Super Mario Bros Simplified",
-		"path-friendly-name": "super-mario-bros-simplified"
+		"shortname": "Super Mario Bros Simplified Negative",
+		"path-friendly-name": "super-mario-bros-simplified-negative"
 	},
 	"tiles_info": {
 		"sprites_extension": "png"
