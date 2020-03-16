@@ -16,8 +16,8 @@ input_dir = 'chunked_data/output_tensors/'
 output_textfile_dir = 'chunked_data/output_textfiles/'
 original_dir = 'chunked_data/one hot tensors/'
 input_textfile_dir = 'chunked_data/input_textfiles/'
-file_name = 'tensor_3-1_698'
-original_file_name = 'one_hot_tensor_mario-3-1_698'
+file_name = 'tensor_3-1_610'
+original_file_name = 'one_hot_tensor_mario-3-1_610'
 
 output_tensor = torch.load(input_dir + file_name + '.pth')
 original_tensor = torch.load(original_dir + original_file_name + '.pth')
@@ -64,7 +64,11 @@ def join_output(tensor, location):
                     tile = tiles[2]
                 else: 
                     normed_probs = nn.functional.normalize(one_hot, p=1, dim=0)
-                    tile = np.random.choice(tiles, p=normed_probs.detach().numpy())
+                    if normed_probs.sum() != 1.0:
+                        tile = tiles[2]
+                    # sometimes the normalized probabilities do not sum to 1 correctly 
+                    else: 
+                        tile = np.random.choice(tiles, p=normed_probs.detach().numpy())
             line_decoded.append(tile)
         chunk_decoded.append(line_decoded)
 
