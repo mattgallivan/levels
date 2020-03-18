@@ -2,12 +2,11 @@ import cv2
 import os
 
 
-def get_list_of_images_to_load(opts = None):
+def extract_images_file_meta_from_path(start_path):
 
     list_of_images = []
 
     # Get list of images
-    start_path = './data/imgs' # current directory
     for path,dirs,files in os.walk(start_path):
         path = path.replace('\\', '/')
         for filename in files:
@@ -31,6 +30,8 @@ def get_list_of_images_to_load(opts = None):
 
     # Return list of images
     return list_of_images
+
+
 
 
 def extract_image_data_into_object(opts):

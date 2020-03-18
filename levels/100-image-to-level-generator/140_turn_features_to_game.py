@@ -5,15 +5,15 @@ import os
 import json
 from pathlib import Path
 
-def convert_features_to_games(images_meta):
+def convert_features_to_games(images_meta, opts):
 
-    games_data = get_compatible_games_info()
+    games_data = get_compatible_games_info(opts['games_path'])
 
     images_meta['output'] = {}
 
     # Conversions utilizing histograms
     if images_meta['features']['histogram_for_tile_by_tilesize'] is not None:
-        games_data = turn_gaming_sprites_into_histograms(games_data)
+        games_data = turn_gaming_sprites_into_histograms(games_data, opts['games_path'])
         match_assets_into_game_levels(images_meta, games_data, 'histogram')
         save_matched_game_levels(images_meta, games_data, 'histogram')
 
@@ -28,6 +28,8 @@ def save_matched_game_levels(images_meta, games_data, asset_type):
 
     for game_name in images_meta['output']:
         output_path = images_meta['output_info']['output_path'] + "games/" + game_name + '/'
+        
+        print(output_path)
 
         curr_game = {}
         for game_info in games_data:
@@ -119,9 +121,8 @@ def compare_game_tiles(tile_repr, sprite_repr, asset_type):
     results = sorted([(v, k) for (k, v) in results.items()], reverse = False)
     return results[0][1]
 
-def turn_gaming_sprites_into_histograms(games_data):
+def turn_gaming_sprites_into_histograms(games_data, start_path):
 
-    start_path = './data/games'
     for game_data in games_data:
         game_data['sprite_info'] = {}
         game_data['features']['sprites_histogram'] = {}
@@ -146,12 +147,11 @@ def turn_gaming_sprites_into_histograms(games_data):
 
     return games_data
 
-def get_compatible_games_info():
+def get_compatible_games_info(start_path):
     
     list_of_games = []
 
     # Get list of games
-    start_path = './data/games' # current directory
     for path,dirs,files in os.walk(start_path):
         path = path.replace('\\', '/')
         for filename in files:

@@ -1,0 +1,17 @@
+.gamimage {
+
+    .tabButtonContainer, .tabButtonContainer .tabTitle {
+        display: inline-block;
+    }
+
+    .tabButtonContainer .tabTitle{
+        margin-right: 10px;
+    }
+
+    .mainInputContainer {
+        min-width: 400px;
+        min-height: 300px;
+        border: 1px solid black;
+    }
+
+}
