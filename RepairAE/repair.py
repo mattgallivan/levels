@@ -16,14 +16,16 @@ if not os.path.exists('./chunked_data'):
     os.mkdir('./chunked_data')
 
 # set hyperparameters
-num_epochs = 100
+num_epochs = 50
 batch_size = 64
-learning_rate = 1e-3
+learning_rate = 5e-4
 
 # model dimensions 
 level_width = 8
 level_height = 8
 level_depth = 13
+
+# autoencoder dimensions
 hidden_layer_dim1 = 32
 hidden_layer_dim2 = 8
 
@@ -72,6 +74,49 @@ class AutoEncoder(nn.Module):
         x = self.decoder(x)
         return x
 
+# convolutional autoencoder dimensions
+encoding_dim = 256
+
+class ConvAutoEncoder(nn.Module):
+    def __init__(self):
+        super(ConvAutoEncoder, self).__init__()
+        # encoder
+        self.conv1 = nn.Conv2d(13, 32, 5)
+        self.conv2 = nn.Conv2d(32, 64, 3)
+        # self.linear1 = nn.Linear(32 * 4 * 4, encoding_dim)
+        # decoder
+        # self.linear_trans1 = nn.Linear(encoding_dim,  32 * 4 * 4) 
+        self.conv_trans1 = nn.ConvTranspose2d(64, 32, 3)
+        self.conv_trans2 = nn.ConvTranspose2d(32, 13, 5)
+
+
+    def forward(self, x):
+        # encode
+        x = self.conv1(x)
+        x = nn.functional.relu(x)
+        # x = x.flatten()
+        # x = self.linear1(x)
+        x = self.conv2(x)
+        x = nn.functional.relu(x)
+
+        # decode 
+        # x = self.linear_trans1(x)
+        # x = nn.functional.relu(x)
+        # x = x.view(32, 4, 4)
+        x = self.conv_trans1(x)
+        x = nn.functional.relu(x)
+        x = self.conv_trans2(x)
+        x = nn.functional.relu(x)
+        return x
+
+def conv_transform(x):
+    x = x.permute(2, 0, 1)
+    return x.view(1, x.shape[0], x.shape[1], x.shape[2])
+
+def conv_to_level(x):
+    x = x.permute(0, 2, 3, 1)
+    return x.view(x.shape[1], x.shape[2], x.shape[3])
+
 def to_level(x):
     # x = 0.5 * (x + 1)
     # x = x.clamp(0, 1)
@@ -81,7 +126,7 @@ def to_level(x):
     x = x.view(level_height, level_width, level_depth)
     return x
 
-model = AutoEncoder()
+model = ConvAutoEncoder()
 loss_function =  nn.MSELoss()
 optimizer = torch.optim.Adam(
     model.parameters(), lr=learning_rate, weight_decay=1e-5
@@ -95,12 +140,8 @@ for epoch in range(num_epochs):
     for i in range(0, dataset.shape[0], batch_size):
         batch_indices = permutation[i:i+batch_size]
         batch = dataset[batch_indices]
-        batch = batch.view(batch.shape[0], level_width*level_height*level_depth)
+        batch = batch.permute(0, 3, 1, 2)
         batch = Variable(batch)
-        # level = dataset[name]
-        # reshape the img tensor
-        # level = level.flatten()
-        # level = Variable(level)
 
         # forward pass
         output = model(batch)
@@ -122,11 +163,14 @@ for epoch in range(num_epochs):
     print('epoch [{}/{}], loss:{:.4f}'
         .format(epoch + 1, num_epochs, loss.data.item()))
 
+level_func = conv_to_level
+tranform_func = conv_transform
+
 # save the output tensors
 for f in files:
     example = torch.load(f)
-    output = model(example.flatten())
-    output = to_level(output)
+    output = model(tranform_func(example))
+    output = level_func(output)
     level_name = f.split("-",1)[1].split(".",1)[0]
     torch.save(output, '{}/tensor_{}.pth'.format(output_dir_name, level_name))
 
