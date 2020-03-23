@@ -38,7 +38,13 @@ def visualize(level, sprites):
 				for x2 in range(0, 16):
 					for y2 in range(0, 16):
 						if pixelsToUse[x2,y2][3]>0:
+							qqq = pixelsToUse[x2,y2][0:-1]
 							pixels[x*16+x2,y*16+y2] = pixelsToUse[x2,y2][0:-1]
+			else:
+				if(level[y][x] == " "):
+					for x2 in range(0, 16):
+						for y2 in range(0, 16):
+							pixels[x*16+x2,y*16+y2] = (0,0,0)
 	
 	#image.save("./Better.jpeg", "JPEG")
 	return image

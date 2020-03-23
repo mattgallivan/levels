@@ -1,22 +1,11 @@
 import glob
 import pickle
 
-def train_MC(levelLocations):
-	levels = []#list of dictionaries, each dictionary a level
-	
-	#Load SMB Converted Level(s)
-	for levelFile in glob.glob(levelLocations):
-		with open(levelFile) as fp:
-			level = {}
-			y = 0
-			for line in fp:
-				level[y] = line
-				y+=1
-			levels.append(level)
-	
+def train_MC(levelLocations, trainingLevels):
+
 	#Extract Markov Random Field Counts from Levels
 	markovCounts = {}# Dictionary of (x-1, y), (x-1, y+1), (x, y+1)
-	for level in levels: 
+	for level in trainingLevels: 
 		minY = 0
 		maxY = len(level)-1
 		for y in range(0, maxY):

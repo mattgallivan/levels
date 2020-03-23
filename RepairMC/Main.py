@@ -8,6 +8,8 @@ import Visualize
 import VidMaker
 import Train
 import Repair
+import Evaluate
+import LevelBreaker
 
 # =================================Inputs=======================================
 
@@ -42,7 +44,17 @@ for filename in glob.glob(spriteLocation):
 # =================================Train=======================================
 
 levelLocations = "./Original/*.txt"
-markovProbabilities = Train.train_MC(levelLocations)
+trainingLevels = []#list of dictionaries, each dictionary a level
+#Load SMB Converted Level(s)
+for levelFile in glob.glob(levelLocations):
+	with open(levelFile) as fp:
+		level = {}
+		y = 0
+		for line in fp:
+			level[y] = line
+			y+=1
+		trainingLevels.append(level)
+markovProbabilities = Train.train_MC(levelLocations, trainingLevels)
 pickle.dump(markovProbabilities, open("smbprobabilities.pickle", "wb"))
 
 # =================================Repair=======================================
@@ -74,4 +86,23 @@ with open("./Better.txt") as fp:
 image = Visualize.visualize(level, sprites)
 image.save("./Better.jpeg", "JPEG")
 
-VidMaker.makeVid(VidImages)
+VidMaker.makeVid(VidImages, 'repair', 5)
+
+# =================================Evluate=======================================
+
+# Add noise to level
+level = trainingLevels[0]
+beforeEval = Evaluate.evaluate(level, markovProbabilities)
+image = Visualize.visualize(level, sprites)
+image.save("./Pre.jpeg", "JPEG")
+brokenLevel = LevelBreaker.break_level(level, markovProbabilities, 0.25, visualization)
+brokenEval = Evaluate.evaluate(brokenLevel, markovProbabilities)
+image = Visualize.visualize(brokenLevel, sprites)
+image.save("./Broke.jpeg", "JPEG")
+repairedLevel, VidImages = Repair.Repair(brokenLevel, markovProbabilities, sprites)
+repairedEval = Evaluate.evaluate(repairedLevel, markovProbabilities)
+image = Visualize.visualize(repairedLevel, sprites)
+image.save("./Repair.jpeg", "JPEG")
+VidMaker.makeVid(VidImages, 'eval', 20)
+
+print("Before: " + str(beforeEval) + "\nBroken: " + str(brokenEval) + "\nRepaired: " + str(repairedEval))

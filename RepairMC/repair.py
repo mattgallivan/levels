@@ -10,10 +10,11 @@ import Train
 
 def Repair(Badlevel, markovProbabilities, sprites):
 	randomSample = True
-	itterations = 10
+	itterations = 1000
 	VidImages = []
 	
 	for interationCounter in range(0,itterations):
+		change = False
 		minY = 0
 		maxY = len(Badlevel)-1
 		list1 = sorted(range(0, maxY), key = lambda x: random.random() )
@@ -63,6 +64,7 @@ def Repair(Badlevel, markovProbabilities, sprites):
 							replaceTile = max(markovProbabilities[key], key=markovProbabilities[key].get)
 							Badlevel[y] = Badlevel[y][0:x] + replaceTile + Badlevel[y][x+1:]
 						VidImages.append(Visualize.visualize(Badlevel, sprites))
+						change = True
 				else:
 					continue
 					#key does not exist
@@ -85,4 +87,6 @@ def Repair(Badlevel, markovProbabilities, sprites):
 						#if(x>0):
 							#Badlevel[y] = Badlevel[y][0:x-1] + replace_surrounding_tiles[3] + Badlevel[y][x:]
 						#VidImages.append(Visualize.visualize(Badlevel, sprites))
+		if(not change):
+			break
 	return Badlevel, VidImages
