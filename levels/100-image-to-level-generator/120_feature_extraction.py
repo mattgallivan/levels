@@ -7,7 +7,9 @@ def extract_features(img_meta, opts = None):
     output = {}
     output['img_for_tile_by_tilesize'] = turn_into_tiles(img_meta['raw_img_data']['opencv'])
     output['histogram_for_tile_by_tilesize'] = turn_tiles_into_histogram(output['img_for_tile_by_tilesize'])
-    save_tiles_as_images_for_debugging(output, img_meta)
+
+    if opts is None or (opts is not None and opts['output'] is not None and opts['output']['save_tiles'] is not False):
+        save_tiles_as_images_for_debugging(output, img_meta)
 
     return output
 

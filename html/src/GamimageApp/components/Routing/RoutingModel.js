@@ -26,23 +26,49 @@ export function RoutingModel(app) {
         let codeProvided = window.location.search !== "";
 
         if (codeProvided) {
-            let id = window.location.search.substring(1);
-            window.history.replaceState({}, document.title, "/");
-            cbf()
+            let code = window.location.search.substring(1);
+            let codeMeta = {code};
+            fetch(apiBaseURL + 'obtainConfigForCode', {
+                method: 'POST', // *GET, POST, PUT, DELETE, etc.
+                mode: 'cors', // no-cors, *cors, same-origin
+                cache: 'no-cache', // *default, no-cache, reload, force-cache, only-if-cached
+                credentials: 'same-origin', // include, *same-origin, omit
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(codeMeta)
+            })
+                .then(response => response.json())
+                .then(config => {
+                    self.updateCodeMeta(codeMeta, config)
+                    self.state.loadedCode = true;
+                    window.history.replaceState({}, document.title, "/");
+                    cbf()
+                })
+            
+            // cbf()
         } else {
             // Code not provided, get a new code
             fetch(apiBaseURL + 'generateNewCode')
                 .then(response => response.json())
                 .then(codeMeta => {
                     self.updateCodeMeta(codeMeta)
+                    self.state.loadedCode = false;
                     cbf()
                 })
         }
 
     }
 
-    self.updateCodeMeta = function (codeMeta) {
+    self.updateCodeMeta = function (codeMeta, config) {
         self.state['codeMeta'] = codeMeta;
+
+        if (config !== undefined) {
+            self.state.generated = {
+                config
+            }
+        }
+
     }
 
 }

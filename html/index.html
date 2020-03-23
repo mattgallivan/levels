@@ -2,6 +2,7 @@
 <html>
     <head>
         <title>Gamifying Images</title>
+        <link href="https://fonts.googleapis.com/css?family=Raleway&display=swap" rel="stylesheet">
         <!-- <link rel="stylesheet" type="text/css" href="assets/css/main.css"> -->
     </head>
     <body>
@@ -10,20 +11,20 @@
         <p>My first paragraph.</p> -->
         
         <div class="gamimage">
-            <div class="inputContainer">
+            <div class="appContainer">
                 <div class="tabButtonsContainer">
 
                 </div>
-                <div class="mainInputContainer">
+                <div class="mainInputContainer mainContainer">
                     <div class="inputContainer upload">
 
-                        <div id="drop-area">
+                        <div id="imageDropArea">
                             <form class="my-form">
-                                <p>Upload multiple files with the file dialog or by dragging and dropping images onto the dashed region</p>
+                                <p>Upload an image with the file dialog or by dragging and dropping one onto the dashed region</p>
                                 <input type="file" id="fileElem" multiple accept="image/*" onchange="handleFiles(this.files)">
-                                <label class="button" for="fileElem">Select some files</label>
+                                <label class="button" for="fileElem">Select an image</label>
                             </form>
-                            <progress id="progress-bar" max=100 value=0></progress>
+                            <!-- <progress id="progress-bar" max=100 value=0></progress> -->
                             <div id="gallery" />
                         </div>
 
@@ -33,14 +34,21 @@
                     </div>
                     
                 </div>
+
+                
             </div>
 
-            <div class="outputContainer">
+            <div class="outputContainer mainContainer">
                 <div class="generatedOutputContainer"></div>
+            </div>
+            
+            <div class="selectedContainer mainContainer">
+                <div class="selectedOutputContainer"></div>
             </div>
 
             <div class="routingSection">
                 <div class="currCodeURL"></div>
+                <canvas class="qrCanvas"></canvas>
             </div>
 
         </div>

@@ -1,5 +1,7 @@
 .gamimage {
 
+    font-family: 'Raleway';
+
     .tabButtonContainer, .tabButtonContainer .tabTitle {
         display: inline-block;
     }
@@ -9,9 +11,85 @@
     }
 
     .mainInputContainer {
-        min-width: 400px;
-        min-height: 300px;
+        min-height: 400px;
+        width: 400px;
         border: 1px solid black;
+        display: inline-block;
+        vertical-align: top;
+    }
+
+    .outputContainer {
+        height: 400px;
+        width: 280px;
+        margin-left: 20px;
+        border: 1px solid black;
+        display: inline-block;
+        vertical-align: top;
+        // padding: 20px;
+        overflow-y: scroll;
+    }
+
+    .selectedContainer {
+        height: 400px;
+        width: 500px;
+        margin-left: 20px;
+        border: 1px solid black;
+        display: inline-block;
+        vertical-align: top;
+        // padding: 20px;
+        // overflow-y: scroll;
+    }
+
+    .selectedOutputContainer {
+        margin: 20px;
+    }
+
+    .selectedOutputMainImg {
+        max-width: 460px;
+        max-height: 340px;
+        cursor: pointer;
+    }
+
+    .uploadedImage {
+        max-width: 400px;
+        max-height: 200px;
+    }
+
+    .outputLevelImage {
+        max-width: 50px;
+        max-height: 50px;
+        margin-right: 8px;
+    }
+
+    .outputMiniDiv {
+        display: inline-block;
+        margin-top: 5px;
+        cursor: pointer;
+    }
+
+    .generatedOutputContainer {
+        margin: 20px;
+    }
+
+    .gameSection-not-0 {
+        margin-top: 20px;
+    }
+
+    .tileSection, .matchMethodSection {
+        margin-left: 10px;
+        margin-top: 5px;
+    }
+
+    .asciiLevel {
+        margin-top: 15px;
+        cursor: pointer;
+    }
+
+    .currCodeURL {
+    }
+
+    .mainContainer {
+        margin-bottom: 15px;
     }
 
 }

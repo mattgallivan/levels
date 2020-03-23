@@ -22,6 +22,7 @@ app = Flask(__name__,
 CORS(app)
 
 base_output_folder = '../dist/userContent'
+# base_output_folder = '../html/userContent'
 
 @app.route('/api/generateNewCode')
 def generateNewCode():
@@ -43,12 +44,18 @@ def getCode(numChars):
     return ''.join(choice(ascii_lowercase) for i in range(numChars))
 
 
+@app.route('/api/obtainConfigForCode', methods=['POST'])
+def obtainConfigForCode():
+    codeMeta = request.json
+    with open(base_output_folder + '/' + codeMeta['code'] + '/output' + '/config.json') as json_file:
+        config = json.load(json_file)      
+        return config  
 
 # https://flask.palletsprojects.com/en/1.1.x/patterns/fileuploads/
 @app.route('/api/uploadImage', methods=['POST'])
 def uploadImage():
     formMeta = request.form.to_dict()
-    upload_folder = base_output_folder +  '/' + formMeta['code'] + '/input/'
+    upload_folder = base_output_folder + '/' + formMeta['code'] + '/input/'
     if request.method == 'POST':
         # check if the post request has the file part
         if 'file' not in request.files:
@@ -86,12 +93,19 @@ def turnImageIntoGameContent():
     print(formMeta)
     upload_folder = base_output_folder +  '/' + formMeta['code']
     if request.method == 'POST':
-        image_to_level.images_to_level({
+        images_meta = image_to_level.images_to_level({
             'start_path': upload_folder + '/input/',
             'output_path': upload_folder + '/output/',
-            'games_path': '../data/games'
+            'games_path': '../data/games',
+            'output': {
+                'save_tiles': False
+            }
         })
-        # print(formMeta)
+
+        with open(images_meta[0]['output_info']['output_path'] + '../' + 'config.json') as json_file:
+            config = json.load(json_file)      
+            return config  
+        
         return formMeta
 
 

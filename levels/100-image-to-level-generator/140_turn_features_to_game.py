@@ -8,6 +8,10 @@ from pathlib import Path
 def convert_features_to_games(images_meta, opts):
 
     games_data = get_compatible_games_info(opts['games_path'])
+    save_games_info(images_meta, games_data, {'tile-based matching': 
+        {'histogram': list(images_meta['features']['histogram_for_tile_by_tilesize'].keys()), 
+         'img': list(images_meta['features']['img_for_tile_by_tilesize'].keys())}
+        }, opts )
 
     images_meta['output'] = {}
 
@@ -15,16 +19,39 @@ def convert_features_to_games(images_meta, opts):
     if images_meta['features']['histogram_for_tile_by_tilesize'] is not None:
         games_data = turn_gaming_sprites_into_histograms(games_data, opts['games_path'])
         match_assets_into_game_levels(images_meta, games_data, 'histogram')
-        save_matched_game_levels(images_meta, games_data, 'histogram')
+        save_matched_game_levels(images_meta, games_data, 'histogram', opts)
 
     # Pixel difference
     if images_meta['features']['img_for_tile_by_tilesize'] is not None:
         match_assets_into_game_levels(images_meta, games_data, 'img')
-        save_matched_game_levels(images_meta, games_data, 'img')
+        save_matched_game_levels(images_meta, games_data, 'img', opts)
 
     return
 
-def save_matched_game_levels(images_meta, games_data, asset_type):
+def save_games_info(images_meta, games_data, conversion_types, opts = None):
+
+    config = {}
+    for games_meta in games_data:
+        games_meta['conversions'] = conversion_types
+    # games_data['conversions'] = conversion_types
+    config['gamesData'] = games_data
+
+    with open(images_meta['output_info']['output_path'] + '../' + 'config.json', 'w') as outfile:
+        json_dump = json.dumps(config, cls=NumpyEncoder)
+        # json.dump(json_dump, outfile, indent=4, sort_keys=True)
+        outfile.write(json_dump)
+
+
+
+
+class NumpyEncoder(json.JSONEncoder):
+    def default(self, obj):
+        if isinstance(obj, np.ndarray):
+            return obj.tolist()
+        return json.JSONEncoder.default(self, obj)        
+
+
+def save_matched_game_levels(images_meta, games_data, asset_type, opts = None):
 
     for game_name in images_meta['output']:
         output_path = images_meta['output_info']['output_path'] + "games/" + game_name + '/'

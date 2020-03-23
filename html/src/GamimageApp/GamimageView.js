@@ -35,16 +35,16 @@ export function GamimageView(app, rootSel, settings) {
 
         let appContainer = self.rootObj;
 
-        let tabButtonContainer = appContainer.select('.tabButtonsContainer').selectAll('.tabButtonContainer')
-            .data(inputMethods)
-            .enter()
-            .append('div')
-            .classed('tabButtonContainer', true)
+        // let tabButtonContainer = appContainer.select('.tabButtonsContainer').selectAll('.tabButtonContainer')
+        //     .data(inputMethods)
+        //     .enter()
+        //     .append('div')
+        //     .classed('tabButtonContainer', true)
 
-        tabButtonContainer
-            .append('div')
-            .classed('tabTitle', true)
-            .text(d => d.tabTitle)
+        // tabButtonContainer
+        //     .append('div')
+        //     .classed('tabTitle', true)
+        //     .text(d => d.tabTitle)
 
 
         self.viewComponents = [
