@@ -36,7 +36,7 @@ def save_games_info(images_meta, games_data, conversion_types, opts = None):
     # games_data['conversions'] = conversion_types
     config['gamesData'] = games_data
 
-    with open(images_meta['output_info']['output_path'] + '../' + 'config.json', 'w') as outfile:
+    with open(images_meta['output_info']['output_path_root'] + 'config.json', 'w') as outfile:
         json_dump = json.dumps(config, cls=NumpyEncoder)
         # json.dump(json_dump, outfile, indent=4, sort_keys=True)
         outfile.write(json_dump)
@@ -55,8 +55,6 @@ def save_matched_game_levels(images_meta, games_data, asset_type, opts = None):
 
     for game_name in images_meta['output']:
         output_path = images_meta['output_info']['output_path'] + "games/" + game_name + '/'
-        
-        print(output_path)
 
         curr_game = {}
         for game_info in games_data:

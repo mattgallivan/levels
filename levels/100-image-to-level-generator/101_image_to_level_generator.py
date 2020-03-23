@@ -37,9 +37,10 @@ def generate_output_path(image_file_meta, output_base_path):
     if (image_file_meta["addition_from_start_path"] != ""):
         output_path += "/"
 
-    output_path += image_file_meta["filename"] + "/"
+    # output_path += image_file_meta["filename"] + "/"
     return {
-        "output_path": output_path
+        "output_path": output_path + image_file_meta["filename"] + "/",
+        "output_path_root": output_path
     }
 
 class NumpyEncoder(json.JSONEncoder):
