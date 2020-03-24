@@ -15,6 +15,11 @@ def convert_features_to_games(images_meta, opts):
 
     images_meta['output'] = {}
 
+    # Matt: I'd add in the trained NN around here.  At this point you have metadata 
+    #       information from the image loaded in memory "images_meta['raw_img_data']", 
+    #       and if you need it, preprocessed *features* of the images (like tiles of it)
+    #       under "images_meta['features']".
+
     # Conversions utilizing histograms
     if images_meta['features']['histogram_for_tile_by_tilesize'] is not None:
         games_data = turn_gaming_sprites_into_histograms(games_data, opts['games_path'])
