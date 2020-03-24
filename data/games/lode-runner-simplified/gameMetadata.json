@@ -7,13 +7,13 @@
 		"sprites_extension": "png"
 	},
     "tiles" : {
-        "B" : {"sprites":["solid","ground"]},
-        "b" : {"sprites":["solid","diggable","ground"]},
-        "." : {"sprites":["passable","empty"]},
-        "-" : {"sprites":["passable","climbable","rope"]},
-        "#" : {"sprites":["passable","climbable","ladder"]},
-        "G" : {"sprites":["passable","pickupable","gold"]},
-        "E" : {"sprites":["damaging","enemy"]},
-        "M" : {"sprites":["passable","spawn"]},
+        "B" : {"sprites":["B"], "props":["solid","ground"]},
+        "b" : {"sprites":["bb"], "props":["solid","diggable","ground"]},
+        "." : {"sprites":["blank"], "props":["passable","empty"]},
+        "-" : {"sprites":["-"], "props":["passable","climbable","rope"]},
+        "#" : {"sprites":["#"], "props":["passable","climbable","ladder"]},
+        "G" : {"sprites":["G"], "props":["passable","pic kupable","gold"]},
+        "E" : {"sprites":["E"], "props":["damaging","enemy"]},
+        "M" : {"sprites":["M"], "props":["passable","spawn"]}
     }
 }
