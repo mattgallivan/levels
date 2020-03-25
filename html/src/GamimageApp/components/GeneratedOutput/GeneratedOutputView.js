@@ -163,11 +163,11 @@ export function GeneratedOutputView(rootObj, app) {
                                                             }
                                                             // Ground
                                                             if (['X'].indexOf(currChar) > -1) {
-                                                                sPortalChar = '5';
+                                                                sPortalChar = '3';
                                                             }
                                                             // Brick
                                                             if (['S'].indexOf(currChar) > -1) {
-                                                                sPortalChar = '3';
+                                                                sPortalChar = '5';
                                                             }
                                                             // Coin
                                                             if (['o'].indexOf(currChar) > -1) {
