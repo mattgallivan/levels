@@ -70,12 +70,20 @@ def save_matched_game_levels(images_meta, games_data, asset_type, opts = None):
         Path(output_path).mkdir(parents=True, exist_ok=True)
         for tile_size in images_meta['output'][game_name][asset_type+'_match']:
             rows_of_tiles_images = []
+            rows_of_tiles_debug_images = []
+
             with open(output_path + asset_type+"_match_"+str(tile_size)+"px_"+images_meta['file_info']["filename_wo_extension"]+".txt", "w") as output_file:
                 for row_of_tiles in images_meta['output'][game_name][asset_type+'_match'][tile_size]:
                     output_file.write("".join(row_of_tiles) + "\n")
                     rows_of_tiles_images.append(cv2.hconcat(list(map(lambda tChar: curr_game['features']['sprites_img'][curr_game['tiles'][tChar]['sprites'][0]], row_of_tiles))))
+                    # if opts['output']['save_tiles'] is True:
+                    #     border_width = 2
+                    #     row_of_tiles_debug_images = list(map(lambda tChar: cv2.copyMakeBorder(curr_game['features']['sprites_img'][curr_game['tiles'][tChar]['sprites'][0]], border_width, border_width, border_width, border_width, cv2.BORDER_CONSTANT, None, [255,255,255]), row_of_tiles))
+                    #     rows_of_tiles_debug_images.append(cv2.hconcat(row_of_tiles_debug_images))
                 cv2.imwrite( output_path + asset_type+"_match_"+str(tile_size)+"px_"+images_meta['file_info']["filename_wo_extension"]+".png", cv2.vconcat(rows_of_tiles_images))
-
+                # if opts['output']['save_tiles'] is True:
+                #     cv2.imwrite( output_path + asset_type+"_match_"+str(tile_size)+"px_"+images_meta['file_info']["filename_wo_extension"]+"_debug_show_tilespacing.png", cv2.vconcat(rows_of_tiles_debug_images))
+                
 
 def match_assets_into_game_levels(images_meta, games_data, asset_type):
 

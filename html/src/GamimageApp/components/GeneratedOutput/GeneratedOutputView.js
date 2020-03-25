@@ -109,6 +109,7 @@ export function GeneratedOutputView(rootObj, app) {
                             selectedContainer
                                 .append('div')
                                 .classed('asciiLevel', true)
+                                .classed('outputLink', true)
                                 .text('ASCII Level')
                                 .on('click', () => {
                                     window.open('./userContent/'
@@ -120,6 +121,89 @@ export function GeneratedOutputView(rootObj, app) {
                                         + new Date().getTime()
                                         , '_blank');
                                 })
+
+                            if (gameDataMeta.game_info['path-friendly-name'] === 'super-mario-bros-simplified') {
+
+                                selectedContainer
+                                    .append('div')
+                                    .classed('outputLink', true)
+                                    .text('Super Chrono Portal')
+                                    .on('click', () => {
+
+                                        let levelFileURL = './userContent/'
+                                            + state.codeMeta.code
+                                            + '/output/uploadedImage.png/games/'
+                                            + gameDataMeta.game_info['path-friendly-name']
+                                            + '/'
+                                            + d.filename + '.txt' + '?'
+                                            + new Date().getTime();
+
+
+                                        fetch(levelFileURL)
+                                            .then(response => response.text())
+                                            .then(text => { 
+                                                let levelHash = "";
+                                                let rows = text.replace("\r","").split("\n");
+
+                                                let sPortalChar;
+                                                for (let r = 0; r < 20; r++) {
+                                                    for (let c = 0; c < 40; c++) {
+                                                        sPortalChar = "0"
+
+                                                        let charExists = (
+                                                            rows.length > r && rows[r].length > c
+                                                        )
+
+                                                        if (charExists) {
+                                                            let currChar = rows[r][c];
+
+                                                            // Empty space
+                                                            if (['-'].indexOf(currChar) > -1) {
+                                                                sPortalChar = '0';
+                                                            }
+                                                            // Ground
+                                                            if (['X'].indexOf(currChar) > -1) {
+                                                                sPortalChar = '5';
+                                                            }
+                                                            // Brick
+                                                            if (['S'].indexOf(currChar) > -1) {
+                                                                sPortalChar = '3';
+                                                            }
+                                                            // Coin
+                                                            if (['o'].indexOf(currChar) > -1) {
+                                                                sPortalChar = '6';
+                                                            }
+                                                            // pipe
+                                                            if (['<','>','[',']'].indexOf(currChar) > -1) {
+                                                                sPortalChar = '4';
+                                                            }
+                                                            // Goomba
+                                                            if (['E'].indexOf(currChar) > -1) {
+                                                                sPortalChar = '7';
+                                                            }
+                                                            // Questionmarks
+                                                            if (['Q','?'].indexOf(currChar) > -1) {
+                                                                sPortalChar = '9';
+                                                            }
+                                                        }
+
+                                                        if (r === 0 && c === 0) sPortalChar = 'F';
+                                                        if (r === 1 && c === 0) sPortalChar = 'G';
+                                                        
+                                                        levelHash += sPortalChar
+                                                    }
+                                                }
+
+                                                // debugger;
+                                                window.open('./games/super-chrono-portal-maker/min/#%7B"hash":"'
+                                                + levelHash
+                                                + '","I":%5B%5D,"J":%5B%5D%7D'
+                                                    , '_blank');
+                                            })
+
+                                    })       
+                            }
+                         
                         })
                         ;
 
