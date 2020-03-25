@@ -102,7 +102,7 @@ def turnImageIntoGameContent():
             }
         })
 
-        with open(images_meta[0]['output_info']['output_path'] + '../' + 'config.json') as json_file:
+        with open(upload_folder + '/output/' + 'config.json') as json_file:
             config = json.load(json_file)      
             return config  
         
@@ -129,4 +129,4 @@ def checkCode():
 
 
 if __name__ == "__main__":
-    app.run()
+    app.run(host='0.0.0.0')
