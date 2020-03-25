@@ -48,6 +48,7 @@
         max-width: 460px;
         max-height: 340px;
         cursor: pointer;
+        display: block;
     }
 
     .uploadedImage {
@@ -80,9 +81,11 @@
         margin-top: 5px;
     }
 
-    .asciiLevel {
+    .outputLink {
         margin-top: 15px;
+        margin-right: 20px;
         cursor: pointer;
+        display: inline-block;
     }
 
     .currCodeURL {

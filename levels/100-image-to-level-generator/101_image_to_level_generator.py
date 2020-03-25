@@ -55,10 +55,10 @@ class NumpyEncoder(json.JSONEncoder):
 if __name__ == "__main__":
 
     images_to_level({
-        'start_path': '../../data/imgs/drawings', # TEAM: Change this to '../../data/imgs' for more outputs (slower)
+        'start_path': '../../data/imgs', # TEAM: Change this to '../../data/imgs' for more outputs (slower)
         'output_path': '../../output/',
         'games_path': '../../data/games',
         'output': {
-            'save_tiles': False
+            'save_tiles': True
         }
     })

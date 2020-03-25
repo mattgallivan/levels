@@ -24,8 +24,9 @@ export function RoutingModel(app) {
 
         // Check if Code is provided
         let codeProvided = window.location.search !== "";
+        let loadCode = codeProvided && window.location.search.substring(1)[0] !== '!'
 
-        if (codeProvided) {
+        if (loadCode) {
             let code = window.location.search.substring(1);
             let codeMeta = {code};
             fetch(apiBaseURL + 'obtainConfigForCode', {
@@ -48,12 +49,26 @@ export function RoutingModel(app) {
             
             // cbf()
         } else {
-            // Code not provided, get a new code
-            fetch(apiBaseURL + 'generateNewCode')
+            // Get a new code or ask for a specific one
+            let newCode = '';
+            if (codeProvided) {
+                newCode = window.location.search.substring(1).replace(/!/g, '');
+            }
+            fetch(apiBaseURL + 'generateNewCode', {
+                method: 'POST', // *GET, POST, PUT, DELETE, etc.
+                mode: 'cors', // no-cors, *cors, same-origin
+                cache: 'no-cache', // *default, no-cache, reload, force-cache, only-if-cached
+                credentials: 'same-origin', // include, *same-origin, omit
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ code: newCode})
+            })
                 .then(response => response.json())
                 .then(codeMeta => {
-                    self.updateCodeMeta(codeMeta)
+                    self.updateCodeMeta(codeMeta);
                     self.state.loadedCode = false;
+                    window.history.replaceState({}, document.title, "/");
                     cbf()
                 })
         }

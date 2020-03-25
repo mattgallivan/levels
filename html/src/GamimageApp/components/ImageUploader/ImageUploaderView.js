@@ -93,6 +93,11 @@ export function ImageUploaderView(rootObj, app) {
             files.forEach(previewFile)
         }
 
+        d3.select('#fileElem')
+            .on('change', function(){
+                handleFiles(this.files);
+            })
+
         function previewFile(file) {
             let reader = new FileReader()
             reader.readAsDataURL(file)

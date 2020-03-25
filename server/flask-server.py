@@ -24,15 +24,26 @@ CORS(app)
 base_output_folder = '../dist/userContent'
 # base_output_folder = '../html/userContent'
 
-@app.route('/api/generateNewCode')
+@app.route('/api/generateNewCode', methods=['POST'])
 def generateNewCode():
     code = 'love'
+    requestedCode = request.json
 
-    while path.exists(base_output_folder +  '/' + code):
-        code = getCode(5)
+    if requestedCode['code'] is not '': 
+        code = requestedCode['code']
 
-    os.makedirs(base_output_folder +  '/' + code + '/input/temp')
-    os.makedirs(base_output_folder +  '/' + code + '/output')
+    # Only get a new random code if it's not specifically 
+    # requested
+    if requestedCode['code'] is '': 
+        while path.exists(base_output_folder +  '/' + code):
+            code = getCode(5)
+
+    input_folder = base_output_folder +  '/' + code + '/input/temp'
+    output_folder = base_output_folder +  '/' + code + '/output'
+    if not os.path.exists(input_folder):
+        os.makedirs(input_folder)
+    if not os.path.exists(output_folder):
+        os.makedirs(output_folder)
 
     metaData = {
         "code": code

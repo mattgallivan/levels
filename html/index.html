@@ -21,9 +21,10 @@
                         <div id="imageDropArea">
                             <form class="my-form">
                                 <p>Upload an image with the file dialog or by dragging and dropping one onto the dashed region</p>
-                                <input type="file" id="fileElem" multiple accept="image/*" onchange="handleFiles(this.files)">
+                                <input type="file" id="fileElem" multiple accept="image/*"> 
                                 <label class="button" for="fileElem">Select an image</label>
                             </form>
+                                <!-- onchange="handleFiles(this.files)" -->
                             <!-- <progress id="progress-bar" max=100 value=0></progress> -->
                             <div id="gallery" />
                         </div>
