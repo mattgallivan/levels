@@ -16,8 +16,8 @@ input_dir = 'chunked_data/output_tensors/'
 output_textfile_dir = 'chunked_data/output_textfiles/'
 original_dir = 'chunked_data/one hot tensors/'
 input_textfile_dir = 'chunked_data/input_textfiles/'
-file_name = 'tensor_3-1_610'
-original_file_name = 'one_hot_tensor_mario-3-1_610'
+file_name = 'tensor_3-1_100'
+original_file_name = 'one_hot_tensor_mario-3-1_100'
 
 output_tensor = torch.load(input_dir + file_name + '.pth')
 original_tensor = torch.load(original_dir + original_file_name + '.pth')

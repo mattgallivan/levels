@@ -45,8 +45,8 @@ for path in pathlib.Path(level_dir).iterdir():
     window_horizontal = 8
     count = 0
     count1=0
-    for vertical_iterator in range(0, ((len(lines_encoded)-window_vertical)-1)):
-        for horizontal_iterator in range(0,((len(lines_encoded[0])-window_horizontal)-1)):
+    for vertical_iterator in range(0, ((len(lines_encoded)-window_vertical)+1)):
+        for horizontal_iterator in range(0,((len(lines_encoded[0])-window_horizontal)+1)):
             window_chunk = [[0 for i in range(window_vertical)] for j in range(window_horizontal)]
             i=0
             j=0
