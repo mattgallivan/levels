@@ -7,7 +7,9 @@ def extract_features(img_meta, opts = None):
     output = {}
     output['img_for_tile_by_tilesize'] = turn_into_tiles(img_meta['raw_img_data']['opencv'])
     output['histogram_for_tile_by_tilesize'] = turn_tiles_into_histogram(output['img_for_tile_by_tilesize'])
-    save_tiles_as_images_for_debugging(output, img_meta)
+
+    if opts is None or (opts is not None and opts['output'] is not None and opts['output']['save_tiles'] is not False):
+        save_tiles_as_images_for_debugging(output, img_meta)
 
     return output
 
@@ -38,10 +40,14 @@ def save_tiles_as_images_for_debugging(output, img_meta):
 
     # Make the output path first if it doesn't exist.
     Path(output_path).mkdir(parents=True, exist_ok=True)
+    Path(output_path +'stitched/').mkdir(parents=True, exist_ok=True)
 
+    border_width = 2
     # Write the tiles as images!
     for tile_size in output['img_for_tile_by_tilesize']:
         r = 0
+        rows_of_tiles_debug_images = []
+        
         for row_of_tiles in output['img_for_tile_by_tilesize'][tile_size]:
             c = 0
             for tile in row_of_tiles:
@@ -50,6 +56,12 @@ def save_tiles_as_images_for_debugging(output, img_meta):
                         + str(c) + ".png", tile) #cv2.cvtColor(tile, cv2.COLOR_RGB2BGR)
                 c += 1
             r += 1
+
+            row_of_tiles_debug_images = list(map(lambda tile: cv2.copyMakeBorder(tile, border_width, border_width, border_width, border_width, cv2.BORDER_CONSTANT, None, [255,255,255]), row_of_tiles))
+            rows_of_tiles_debug_images.append(cv2.hconcat(row_of_tiles_debug_images))
+
+        cv2.imwrite( output_path +'stitched/' + str(tile_size)+"px_debug_show_tilespacing.png", cv2.vconcat(rows_of_tiles_debug_images))
+                
 
 def turn_into_tiles(opencv_img, opts = None):
 

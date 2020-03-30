@@ -8,7 +8,8 @@ __MACOSX
 *.zip
 
 node_modules/
-dist/
+dist/*
+!dist/games
 
 userContent/
 
@@ -30,7 +31,7 @@ __pycache__/
 .Python
 build/
 develop-eggs/
-dist/
+#dist/
 downloads/
 eggs/
 .eggs/

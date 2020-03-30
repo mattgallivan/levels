@@ -5,14 +5,29 @@ import * as d3 from 'd3';
 export function ImageUploaderView(rootObj, app) {
     let self = this;
     self.app = app;
+    self.state = app.model.state;
     self.rootObj = rootObj;
     self.objs = {}
 
 
     self.setupInitialView = function () {
 
+        
+        // if (self.state.loadedCode !== undefined) {
+        //     self.rootObj.select('#imageDropArea')
+        //         .selectAll('*')
+        //         .remove();
+        // } else {
+        // }
+
+
+
+    }
+
+    self.setupDragArea = function (state) {
+
         // ************************ Drag and drop ***************** //
-        let dropArea = document.getElementById("drop-area")
+        let dropArea = document.getElementById("imageDropArea")
 
             // Prevent default drag behaviors
             ;['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
@@ -53,10 +68,10 @@ export function ImageUploaderView(rootObj, app) {
         }
 
         let uploadProgress = []
-        let progressBar = document.getElementById('progress-bar')
+        // let progressBar = document.getElementById('progress-bar')
 
         function initializeProgress(numFiles) {
-            progressBar.value = 0
+            // progressBar.value = 0
             uploadProgress = []
 
             for (let i = numFiles; i > 0; i--) {
@@ -68,7 +83,7 @@ export function ImageUploaderView(rootObj, app) {
             uploadProgress[fileNumber] = percent
             let total = uploadProgress.reduce((tot, curr) => tot + curr, 0) / uploadProgress.length
             console.debug('update', fileNumber, percent, total)
-            progressBar.value = total
+            // progressBar.value = total
         }
 
         function handleFiles(files) {
@@ -77,6 +92,11 @@ export function ImageUploaderView(rootObj, app) {
             files.forEach(uploadFile)
             files.forEach(previewFile)
         }
+
+        d3.select('#fileElem')
+            .on('change', function(){
+                handleFiles(this.files);
+            })
 
         function previewFile(file) {
             let reader = new FileReader()
@@ -117,12 +137,29 @@ export function ImageUploaderView(rootObj, app) {
             formData.append('file', file)
             xhr.send(formData)
         }
-        
 
     }
 
     self.draw = function (state, settings, data) {
+        if (self.state.loadedCode) {
 
+            let inputContainer = self.rootObj.select('.inputContainer.upload');
+            inputContainer.select('#imageDropArea')
+                .remove();
+            
+            if (inputContainer.select('.uploadedImage').empty()) {
+                inputContainer
+                    .append('img')
+                    .classed('uploadedImage', true)
+                    .attr('src', d => './userContent/'
+                        + state.codeMeta.code
+                        + '/input/uploadedImage.png' + '?'
+                        + new Date().getTime())
+            }
+
+        } else {
+            self.setupDragArea(self.state)
+        }
     }
 
     self.setupInitialView();

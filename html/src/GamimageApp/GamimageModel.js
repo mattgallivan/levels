@@ -28,11 +28,9 @@ export function GamimageModel(app, initialState, initialSettings, initialData) {
                     body: JSON.stringify(val)
                 })
                 .then(response => response.json())
-                .then(codeMeta => {
-                    debugger;
-
+                .then(config => {
                     self.state.generated = {
-                        games: ['super-mario-bros-simplified', 'super-mario-bros-simplified-negative']
+                        config
                     }
                     app.view.draw(self.state, self.settings);
                 })

@@ -8,28 +8,58 @@ from pathlib import Path
 def convert_features_to_games(images_meta, opts):
 
     games_data = get_compatible_games_info(opts['games_path'])
+    save_games_info(images_meta, games_data, {'tile-based matching': 
+        {'histogram': list(images_meta['features']['histogram_for_tile_by_tilesize'].keys()), 
+         'img': list(images_meta['features']['img_for_tile_by_tilesize'].keys())}
+        }, opts )
 
     images_meta['output'] = {}
+
+    # Matt: I'd add in the trained NN around here.  At this point you have metadata 
+    #       information from the image loaded in memory "images_meta['raw_img_data']", 
+    #       and if you need it, preprocessed *features* of the images (like tiles of it)
+    #       under "images_meta['features']".
 
     # Conversions utilizing histograms
     if images_meta['features']['histogram_for_tile_by_tilesize'] is not None:
         games_data = turn_gaming_sprites_into_histograms(games_data, opts['games_path'])
         match_assets_into_game_levels(images_meta, games_data, 'histogram')
-        save_matched_game_levels(images_meta, games_data, 'histogram')
+        save_matched_game_levels(images_meta, games_data, 'histogram', opts)
 
     # Pixel difference
     if images_meta['features']['img_for_tile_by_tilesize'] is not None:
         match_assets_into_game_levels(images_meta, games_data, 'img')
-        save_matched_game_levels(images_meta, games_data, 'img')
+        save_matched_game_levels(images_meta, games_data, 'img', opts)
 
     return
 
-def save_matched_game_levels(images_meta, games_data, asset_type):
+def save_games_info(images_meta, games_data, conversion_types, opts = None):
+
+    config = {}
+    for games_meta in games_data:
+        games_meta['conversions'] = conversion_types
+    # games_data['conversions'] = conversion_types
+    config['gamesData'] = games_data
+
+    with open(images_meta['output_info']['output_path_root'] + 'config.json', 'w') as outfile:
+        json_dump = json.dumps(config, cls=NumpyEncoder)
+        # json.dump(json_dump, outfile, indent=4, sort_keys=True)
+        outfile.write(json_dump)
+
+
+
+
+class NumpyEncoder(json.JSONEncoder):
+    def default(self, obj):
+        if isinstance(obj, np.ndarray):
+            return obj.tolist()
+        return json.JSONEncoder.default(self, obj)        
+
+
+def save_matched_game_levels(images_meta, games_data, asset_type, opts = None):
 
     for game_name in images_meta['output']:
         output_path = images_meta['output_info']['output_path'] + "games/" + game_name + '/'
-        
-        print(output_path)
 
         curr_game = {}
         for game_info in games_data:
@@ -40,12 +70,63 @@ def save_matched_game_levels(images_meta, games_data, asset_type):
         Path(output_path).mkdir(parents=True, exist_ok=True)
         for tile_size in images_meta['output'][game_name][asset_type+'_match']:
             rows_of_tiles_images = []
+            rows_of_tiles_debug_images = []
+
             with open(output_path + asset_type+"_match_"+str(tile_size)+"px_"+images_meta['file_info']["filename_wo_extension"]+".txt", "w") as output_file:
                 for row_of_tiles in images_meta['output'][game_name][asset_type+'_match'][tile_size]:
                     output_file.write("".join(row_of_tiles) + "\n")
                     rows_of_tiles_images.append(cv2.hconcat(list(map(lambda tChar: curr_game['features']['sprites_img'][curr_game['tiles'][tChar]['sprites'][0]], row_of_tiles))))
+                    # if opts['output']['save_tiles'] is True:
+                    #     border_width = 2
+                    #     row_of_tiles_debug_images = list(map(lambda tChar: cv2.copyMakeBorder(curr_game['features']['sprites_img'][curr_game['tiles'][tChar]['sprites'][0]], border_width, border_width, border_width, border_width, cv2.BORDER_CONSTANT, None, [255,255,255]), row_of_tiles))
+                    #     rows_of_tiles_debug_images.append(cv2.hconcat(row_of_tiles_debug_images))
                 cv2.imwrite( output_path + asset_type+"_match_"+str(tile_size)+"px_"+images_meta['file_info']["filename_wo_extension"]+".png", cv2.vconcat(rows_of_tiles_images))
+                # if opts['output']['save_tiles'] is True:
+                #     cv2.imwrite( output_path + asset_type+"_match_"+str(tile_size)+"px_"+images_meta['file_info']["filename_wo_extension"]+"_debug_show_tilespacing.png", cv2.vconcat(rows_of_tiles_debug_images))
 
+
+
+def generate_images_from_ascii_files(opts):
+    games_data = get_compatible_games_info(opts['games_path'])
+    games_data = turn_gaming_sprites_into_histograms(games_data, opts['games_path'])
+
+    levels_meta = extract_levels_file_meta_from_path(opts['levels_path'])
+
+    for game_data in games_data:
+        if game_data['game_info']['path-friendly-name'] == 'super-mario-bros-simplified':
+            for level_meta in levels_meta:
+                with open(level_meta['full_filename'], "r") as input_file:
+                    rows_of_tiles_images = []
+                    for line in input_file:
+                        rows_of_tiles_images.append(cv2.hconcat(list(map(lambda tChar: game_data['features']['sprites_img'][game_data['tiles'][tChar]['sprites'][0]], line.replace('\n', '')))))
+                    cv2.imwrite(level_meta['path'] + level_meta['filename_wo_extension'] +".png", cv2.vconcat(rows_of_tiles_images))
+
+def extract_levels_file_meta_from_path(start_path):
+
+    list_of_levels = []
+
+    # Get list of images
+    for path,dirs,files in os.walk(start_path):
+        path = path.replace('\\', '/')
+        for filename in files:
+            filename_wo_extension, extension = os.path.splitext(filename)
+            full_filename = os.path.join(path,filename).replace('\\', '/')
+            addition_from_start_path = path[len(start_path):]
+            if (addition_from_start_path != '' and addition_from_start_path[0] == '/'):
+                addition_from_start_path = addition_from_start_path[1:]
+            if extension == '.txt':
+                list_of_levels.append({
+                    "full_filename": full_filename,
+                    "filename": filename,
+                    "path": path,
+                    "filename_wo_extension": filename_wo_extension,
+                    "extension": extension,
+                    "start_path": start_path, 
+                    "addition_from_start_path": addition_from_start_path
+                })
+
+    return list_of_levels
+                
 
 def match_assets_into_game_levels(images_meta, games_data, asset_type):
 
@@ -180,3 +261,11 @@ def get_compatible_games_info(start_path):
 
 
     return list_of_games
+
+
+
+if __name__ == "__main__":
+    generate_images_from_ascii_files({
+        'levels_path': './generate_images_from_ascii_files/',
+        'games_path': '../../data/games',
+    })
