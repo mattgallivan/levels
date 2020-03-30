@@ -20,16 +20,15 @@ model_path = './autoencoder_weights_cce.pth'
 
 # 1. train the model
 model = repair.ConvAutoEncoder
-# data = repair.load_data()
-# train_data, test_data = repair.split_data(data)
+data = repair.load_data()
+train_data, test_data = repair.split_data(data)
 labels, data = repair.load_data_categorical()
-train_labels, train_data, test_labels, test_data = repair.split_data_categorical(labels, data)
 
 learning_rate = 1e-3
-repair.train_categorical(train_labels, train_data, learning_rate, model, model_path)
-repair.eval_categorical(test_labels, test_data, model, model_path)
-# repair.train(train_data, learning_rate, model, model_path)
-# repair.eval(test_data, model, model_path)
+# repair.train_categorical(labels, data, learning_rate, model, model_path)
+# repair.eval_categorical(labels, data, model, model_path)
+repair.train(train_data, learning_rate, model, model_path)
+repair.eval(test_data, model, model_path)
 
 # 2. generate chunked output tensors 
 input_path = './PCGML3/mario_1-1_broken/'
