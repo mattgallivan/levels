@@ -5,50 +5,72 @@ import torch
 import torchvision
 from torch import nn
 from torch.autograd import Variable
-from torch.utils.data import DataLoader
 from torchvision import transforms
 from torchvision.utils import save_image
 
 import repair
 from createleveltry2 import create_level
 from join import join_input, join_output, join_output_deterministic
+from generate_one_hot import generate_one_hot
 from guzdial_autoencoder import GuzdialConvAutoEncoder
 from visualize_level import visualize_level
 
-
-model_path = './autoencoder_weights_cce.pth'
-
-# 1. train the model
+# select which model to use and make sure the appropriate path is selected
 model = repair.ConvAutoEncoder
-data = repair.load_data()
-train_data, test_data = repair.split_data(data)
-labels, data = repair.load_data_categorical()
+model_path = './autoencoder_weights.pth'
+base_path = './repair_output/'
 
-learning_rate = 1e-3
-# repair.train_categorical(labels, data, learning_rate, model, model_path)
-# repair.eval_categorical(labels, data, model, model_path)
-repair.train(train_data, learning_rate, model, model_path)
-repair.eval(test_data, model, model_path)
+# this pipeline is developed to train the network then take a single level file 
+# and run it through the repair autoencoder
 
-# 2. generate chunked output tensors 
-input_path = './PCGML3/mario_1-1_broken/'
-output_path = './PCGML3/mario_1-1_broken_output/'
-textfile_dir = 'textfiles/'
-repair.output(model, model_path, input_path, output_path, textfile_dir)
+# level path must be the path to a txt file
+def pipeline(level_path, train=False):
+    if train:
+        # 1. train the model
+        data = repair.load_data()
+        train_data, test_data = repair.split_data(data)
+        # labels, data = repair.load_data_categorical()
 
-# # 3. join the chunks
-# one_hot_tensor_dir = os.listdir('./PCGML3/mario_1-1_broken_output/')
-# level_dir = "./PCGML3/levels_broken/"
-# one_hot_tensor_path = "./PCGML3/mario_1-1_broken_output/"
-# create_level(one_hot_tensor_dir, level_dir, one_hot_tensor_path)
+        learning_rate = 1e-3
+        # repair.train_categorical(labels, data, learning_rate, model, model_path)
+        # repair.eval_categorical(labels, data, model, model_path)
+        repair.train(train_data, learning_rate, model, model_path)
+        repair.eval(test_data, model, model_path)
 
-# # 4. turn the tensor back to ASCII 
-# output_tensor = torch.load('./PCGML3/levels_broken/overall_tensor_output.pth')
-# join_output_deterministic(output_tensor, './PCGML3/levels_broken/', 'repaired_output', save=True) 
+    # 2. generate chunked input tensors
+    input_level_path = level_path
+    # output_path = './PCGML3/mario_1-1_broken/'
+    output_path = base_path + 'input_tensors/'
+    if not os.path.exists(output_path):
+        os.makedirs(output_path)
+    generate_one_hot(input_level_path, output_path)
 
-# 5. visualize the output
-# input_dir = './PCGML3/levels_broken/'
-# output_dir = './PCGML3/levels_broken/'
-# file_name = 'repaired_output'
-# visualize_level(input_dir + 'mario-1-1-broken.txt', input_dir + file_name, output_dir + file_name)
+    # 3. generate chunked output tensors 
+    # input_path is a path to the directory containing the one-hot encodings of the level we wish to repair
+    # input_path = './PCGML3/mario_1-1_broken/'
+    input_path = output_path
+    # output_path = './PCGML3/mario_1-1_broken_output/'
+    output_path = base_path + 'output_tensors/'
+    if not os.path.exists(output_path):
+        os.makedirs(output_path)
+    repair.output(model, model_path, input_path, output_path)
 
+    # 4. join the chunks
+    chunk_dir = output_path
+    # save the file to the output path, this should be a file not a directory
+    # output_file = './PCGML3/mario_1-1_broken_output_joined.pth'
+    output_file = base_path + 'joined.pth'
+    # original file is needed to determine the output dimensions
+    create_level(input_level_path, chunk_dir, output_file)
+
+    # 5. turn the tensor back to ASCII 
+    repaired_level_tensor = torch.load(output_file)
+    repaired_level_textfile = base_path + 'joined.txt'
+    join_output_deterministic(repaired_level_tensor, repaired_level_textfile, save=True) 
+
+    # 6. visualize the output
+    input_file = repaired_level_textfile
+    output_file = base_path + 'joined.jpeg'
+    visualize_level(input_level_path, input_file, output_file)
+
+pipeline('./PCGML3/levels/mario-1-1.txt')

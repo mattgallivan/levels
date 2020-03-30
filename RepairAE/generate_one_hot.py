@@ -1,18 +1,14 @@
-import numpy as np
 import os
 import torch
-import torch.nn as nn
 import pathlib
 from pathlib import Path
-
-level_dir = "./PCGML3/levels/"
-one_hot_tensor_dir = "./PCGML3/mario_1-1_broken/"
 
 tiles = ["X", "S", "-", "?", "Q", "E", "<", ">", "[", "]", "o", "B", "b"]
 tiles_len = len(tiles)
 lines = []
 
-for path in pathlib.Path(level_dir).iterdir():
+def generate_one_hot(level_path, output_path):
+    path = pathlib.Path(level_path)
     filename = path.stem
     if path.is_file() and path.suffix == '.txt':
         current_file = open(path, "r")
@@ -23,7 +19,7 @@ for path in pathlib.Path(level_dir).iterdir():
             line_to_write = [n for n in line_read]
             lines.append(line_to_write)
     else:
-        continue
+        print("Level path was not a .txt file")
 
     lines_encoded = []
     for line in lines:
@@ -86,7 +82,7 @@ for path in pathlib.Path(level_dir).iterdir():
             print(tensor_to_produce.shape)
 
             #saving tensor if required
-            torch.save(tensor_to_produce, os.path.join(one_hot_tensor_dir, 'one_hot_tensor_{name}_{id}.pth'.format(name = filename, id = count)))
+            torch.save(tensor_to_produce, os.path.join(output_path, 'one_hot_tensor_{name}_{id}.pth'.format(name = filename, id = count)))
 
 
     #Total chunks created

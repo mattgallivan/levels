@@ -258,7 +258,7 @@ def eval_categorical(labels, data, model, model_path):
     loss = loss_function(output, labels.long())
     print("test loss:", loss.data.item())
 
-def output(model, model_path, input_path, output_path, textfile_dir):
+def output(model, model_path, input_path, output_path):
     model = model()
     model.load_state_dict(torch.load(model_path))
     model = model.eval()
@@ -274,9 +274,9 @@ def output(model, model_path, input_path, output_path, textfile_dir):
         # visualize some tensors 
         if i % 100 == 0:
             print("input")
-            join_input(example, input_path + textfile_dir, "input" + str(i))
+            join_input(example, input_path + 'textfiles/', "input" + str(i))
             print("output")
-            join_output_deterministic(output, output_path + textfile_dir, "output" + str(i), save=True)
+            join_output_deterministic(output, output_path + 'textfiles/' + str(i) + '.txt')
         i += 1
         level_name = int(f.split("_")[-1].split(".")[0])
         torch.save(output, '{}/{}'.format(output_path, level_name))

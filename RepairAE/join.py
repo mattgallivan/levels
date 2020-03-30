@@ -81,7 +81,7 @@ def join_output(tensor, location, file_name, save=False):
                     the_file.write(k)
                 the_file.write("\n")
 
-def join_output_deterministic(tensor, location, file_name, save=False):
+def join_output_deterministic(tensor, file_path, save=False):
     chunk_decoded = []
 
     for vertical_iterator in range(tensor.shape[0]):
@@ -103,7 +103,7 @@ def join_output_deterministic(tensor, location, file_name, save=False):
         print("")
 
     if save:
-        with open(location + file_name + '.txt', "w") as the_file:
+        with open(file_path, "w") as the_file:
             for listt in chunk_decoded:
                 for k in listt:
                     the_file.write(k)
