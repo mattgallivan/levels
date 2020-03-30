@@ -12,7 +12,7 @@ from pathlib import Path
 # level_dir = "./levels/"
 # one_hot_tensor_path = "./mario_1-1_output/"
 
-def create_level(one_hot_tensor_dir, level_dir, one_hot_tensor_path):
+def create_level(level_path, one_hot_tensor_dir, output_path):
     #representing tiles
     tiles = ["X", "S", "-", "?", "Q", "E", "<", ">", "[", "]", "o", "B", "b"]
     tiles_len = len(tiles)
@@ -23,34 +23,33 @@ def create_level(one_hot_tensor_dir, level_dir, one_hot_tensor_path):
 
     #opening level
     lines = []
-    for path in pathlib.Path(level_dir).iterdir():
-        filename = path.stem
-        if path.is_file():
-            current_file = open(path, "r")
-            lines = []
-            for line in current_file:
-                line_read = line.split(',')
-                line_to_write = [n for n in line_read]
-                lines.append(line_to_write)
+    path = pathlib.Path(level_path)
+    if path.is_file():
+        current_file = open(path, "r")
+        lines = []
+        for line in current_file:
+            line_read = line.split(',')
+            line_to_write = [n for n in line_read]
+            lines.append(line_to_write)
 
-        lines_encoded = []
-        for line in lines:
-            line_after_encode=[]
-            for eachline in line:
-                for i in eachline:
-                    if i != "\n":
-                        line_after_encode.append(i)
+    lines_encoded = []
+    for line in lines:
+        line_after_encode=[]
+        for eachline in line:
+            for i in eachline:
+                if i != "\n":
+                    line_after_encode.append(i)
 
-                    elif i == "\n":
-                        pass
-                lines_encoded.append(line_after_encode)
-        print(lines_encoded)
+                elif i == "\n":
+                    pass
+            lines_encoded.append(line_after_encode)
+    print(lines_encoded)
 
-        level_height = len(lines_encoded)
-        level_width = len(lines_encoded[0])
+    level_height = len(lines_encoded)
+    level_width = len(lines_encoded[0])
 
-        print(level_width)
-        print(level_height)
+    print(level_width)
+    print(level_height)
 
     overall_tensor = torch.zeros(level_height, level_width, tiles_len)
 
@@ -64,8 +63,9 @@ def create_level(one_hot_tensor_dir, level_dir, one_hot_tensor_path):
     count_horizontal_position = 0
 
     #load the files in sorted order
-    for filename in sorted(one_hot_tensor_dir, key=lambda x: int(os.path.splitext(x)[0])):
-        test_tensor = torch.load(one_hot_tensor_path + '{filename}'.format(filename = filename))
+    files = os.listdir(one_hot_tensor_dir)
+    for filename in sorted(files, key=lambda x: int(os.path.splitext(x)[0])):
+        test_tensor = torch.load(one_hot_tensor_dir + '{filename}'.format(filename = filename))
 
         if vertical_counter < (level_height - window_vertical + 1):
             if horizontal_counter < (level_width - window_horizontal + 1):
@@ -127,4 +127,4 @@ def create_level(one_hot_tensor_dir, level_dir, one_hot_tensor_path):
                         horizontal_counter+=1
                         tensor_iterator+=1
 
-    torch.save(overall_tensor, level_dir + "overall_tensor_output.pth")
+    torch.save(overall_tensor, output_path)

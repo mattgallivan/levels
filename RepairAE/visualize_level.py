@@ -6,12 +6,12 @@ import pathlib
 
 #Load sprites
 sprites = {}
-for filename in glob.glob("./PCGML3/sprites/*.png"):
+for filename in glob.glob("./sprites/*.png"):
 	im = Image.open(filename)
 	splits = filename.split("/")
 	name = splits[-1][:-4]
 	sprites[name] = im
-	print (str(im.size))
+	# print (str(im.size))
 
 visualization = {}
 visualization["S"] = "brick"
@@ -29,7 +29,7 @@ visualization["b"] = "cannonBottom"
 #Visualize Output Level
 def visualize_level(level_file, input_file, output_file):
 	level = {}
-	with open(input_file + ".txt") as fp:
+	with open(input_file) as fp:
 		y = 0
 		for line in fp:
 			level[y] = line
@@ -89,4 +89,4 @@ def visualize_level(level_file, input_file, output_file):
 						if pixelsToUse[x2,y2][3]>0:
 							pixels[x*16+x2,y*16+y2] = pixelsToUse[x2,y2][0:-1]
 
-	image.save(output_file + ".jpeg", "JPEG")
+	image.save(output_file, "JPEG")
