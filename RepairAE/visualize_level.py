@@ -2,10 +2,11 @@ import sys
 import os
 import glob
 from PIL import Image
+import pathlib
 
 #Load sprites
 sprites = {}
-for filename in glob.glob("./sprites/*.png"):
+for filename in glob.glob("./PCGML3/sprites/*.png"):
 	im = Image.open(filename)
 	splits = filename.split("/")
 	name = splits[-1][:-4]
@@ -26,24 +27,51 @@ visualization["B"] = "cannonTop"
 visualization["b"] = "cannonBottom"
 
 #Visualize Output Level
-# input_dir = 'chunked_data/output_textfiles/'
-# output_dir = 'chunked_data/output_chunks/'
-# file_name = 'tensor_5-1_793'
-
-def visualize_chunk(input_dir, output_dir, file_name):
+def visualize_level(level_file, input_file, output_file):
 	level = {}
-	with open(input_dir + file_name + '.txt') as fp:
+	with open(input_file + ".txt") as fp:
 		y = 0
 		for line in fp:
 			level[y] = line
 			y+=1
 
-	image = Image.new("RGB", (128,128), color=(91, 153, 254))
+	#Level Dimensions
+	level_width = 0
+	level_height = 0
+
+	#opening level
+	current_file = open(level_file, "r")
+	lines = []
+	for line in current_file:
+		line_read = line.split(',')
+		line_to_write = [n for n in line_read]
+		lines.append(line_to_write)
+
+	lines_encoded = []
+	for line in lines:
+		line_after_encode=[]
+		for eachline in line:
+			for i in eachline:
+				if i != "\n":
+					line_after_encode.append(i)
+
+				elif i == "\n":
+					pass
+			lines_encoded.append(line_after_encode)
+	print(lines_encoded)
+
+	level_height = len(lines_encoded)
+	level_width = len(lines_encoded[0])
+
+	print(level_width)
+	print(level_height)
+
+	maxX = level_width
+	maxY = level_height
+
+	image = Image.new("RGB", (maxX*16, maxY*16), color=(91, 153, 254))
 	pixels = image.load()
 
-	maxY = 8
-	maxX = 8
-	import pdb; pdb.set_trace()
 	for y in range(0, maxY):
 		for x in range(0, maxX):
 			imageToUse = None
@@ -61,4 +89,4 @@ def visualize_chunk(input_dir, output_dir, file_name):
 						if pixelsToUse[x2,y2][3]>0:
 							pixels[x*16+x2,y*16+y2] = pixelsToUse[x2,y2][0:-1]
 
-	image.save(output_dir + file_name + ".jpeg", "JPEG")
+	image.save(output_file + ".jpeg", "JPEG")
