@@ -2,6 +2,7 @@ import os
 import json
 import glob
 import pickle
+import cv2
 from PIL import Image
 
 import Inputs
@@ -13,7 +14,9 @@ import PixelGen
 
 # Inputs ================================================================================
 # Actual image(s):
-inputImage = Image.open("TestImg.png")
+imageName = "TestImg.jpeg"
+inputImage_pil = Image.open(imageName)
+inputImage_cv = cv2.imread(imageName)
 
 # Locations and Methods:
 dataLocation = "./data/games/"
@@ -41,12 +44,13 @@ if(selectedGenMethod == 'CNN'):
     x = 0
 
 if(selectedGenMethod == 'Pixel'):
-    generatedLevel = PixelGen.generate(inputImage, sprites, spriteAsciiMap, 16, 'img')
-
+    generatedLevel = PixelGen.generate(inputImage_cv, sprites, spriteAsciiMap, 16, 'img')
+    
 # Evaluation 1 ===========================================================================
 # generatedLevel => (values)
 generatedImage = Visualize.visualize(generatedLevel, sprites, spriteAsciiMap)
-EvaluateMC.evaluate(generatedLevel, markovProbabilities)
+generatedImage.save("./generatedLevel.jpeg", "JPEG")
+closeGen = EvaluateMC.evaluate(generatedLevel, markovProbabilities)
 
 # Repair the levels ======================================================================
 # generatedLevel => repairedLevel
@@ -60,5 +64,9 @@ if(selectedRepairMethod == 'MarkovChain'):
 # Evaluation 2 ===========================================================================
 # repairedLevel => (values)
 repairedImage = Visualize.visualize(repairedLevel, sprites, spriteAsciiMap)
+repairedImage.save("./repairedImage.jpeg", "JPEG")
+closeRepair = EvaluateMC.evaluate(repairedLevel, markovProbabilities)
 
 # Plotting ===============================================================================
+print("Closeness After Gen: " + str(closeGen))
+print("Closeness After Repair: " + str(closeRepair))
