@@ -7,6 +7,7 @@ from PIL import Image
 
 import Inputs
 import RepairMC
+import RepairAE
 import EvaluateMC
 import Visualize
 import PixelGen
@@ -14,9 +15,10 @@ import PixelGen
 
 # Inputs ================================================================================
 # Actual image(s):
-imageName = "TestImg.jpeg"
-inputImage_pil = Image.open(imageName)
-inputImage_cv = cv2.imread(imageName)
+imageName = "TestImg"
+imageFile = "TestImg.jpeg"
+inputImage_pil = Image.open(imageFile)
+inputImage_cv = cv2.imread(imageFile)
 
 # Locations and Methods:
 dataLocation = "./data/games/"
@@ -30,7 +32,7 @@ pixelSize = 16
 #user Input
 selectedGame = gameOptions[1]
 selectedGenMethod = generateMethods[1]
-selectedRepairMethod = repairMethods[1]
+selectedRepairMethod = repairMethods[0]
 selectedMpixelMethods = pixelMethods[0]
 
 # Game data and game pretrained models (should be files):
@@ -39,6 +41,7 @@ trainedModelLocations = dataLocation + selectedGame + "/trainedModels/"
 markovProbabilities = pickle.load(open(trainedModelLocations + "smbprobabilities.pickle", "rb"))
 trainedCNN = []
 trainedAutoEncoder = []
+tempFileLocation = "./Temp_for_AE/"
 
 # Generate the level from the images======================================================
 # inputImage => generatedLevel
@@ -59,7 +62,7 @@ closeGen = EvaluateMC.evaluate(generatedLevel, markovProbabilities)
 # generatedLevel => repairedLevel
 repairedLevel = []
 if(selectedRepairMethod == 'AutoEncoder'):
-    x = 0
+    repairedLevel = RepairAE.Repair(generatedLevel, tempFileLocation, imageName, spriteAsciiMap)
 
 if(selectedRepairMethod == 'MarkovChain'):
     repairedLevel = RepairMC.Repair(generatedLevel, markovProbabilities)
