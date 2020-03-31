@@ -18,8 +18,8 @@ if not os.path.exists('./chunked_data'):
     os.mkdir('./chunked_data')
 
 # set hyperparameters
-num_epochs = 100
-batch_size = 64
+num_epochs = 20
+batch_size = 32
 
 # model dimensions 
 level_width = 8
@@ -122,27 +122,31 @@ class ConvAutoEncoder(nn.Module):
     def __init__(self):
         super(ConvAutoEncoder, self).__init__()
         # encoder
-        self.conv1 = nn.Conv2d(13, 32, kernel_size=3)
-        self.conv2 = nn.Conv2d(32, 64, kernel_size=3)
-        self.conv3 = nn.Conv2d(64, 128, kernel_size=3)
+        self.conv1 = nn.Conv2d(13, 64, kernel_size=3)
+        self.conv2 = nn.Conv2d(64, 128, kernel_size=3)
+        # self.conv3 = nn.Conv2d(64, 128, kernel_size=2)
         # decoder
-        self.conv_trans1 = nn.ConvTranspose2d(128, 64, kernel_size=3)
-        self.conv_trans2 = nn.ConvTranspose2d(64, 32, kernel_size=3)
-        self.conv_trans3 = nn.ConvTranspose2d(32, 13, kernel_size=3)
+        # self.conv_trans1 = nn.ConvTranspose2d(128, 64, kernel_size=2)
+        self.conv_trans2 = nn.ConvTranspose2d(128, 64, kernel_size=3)
+        self.conv_trans3 = nn.ConvTranspose2d(64, 13, kernel_size=3)
+
+        self.drop_out = nn.Dropout()
 
 
     def forward(self, x):
         # encode
-        x = nn.functional.relu(self.conv1(x))
-        x = nn.functional.relu(self.conv2(x))
-        x = nn.functional.relu(self.conv3(x))
+        x = torch.tanh(self.conv1(x))
+        x = self.drop_out(x)
+        x = torch.tanh(self.conv2(x))
+        # x = nn.functional.relu(self.conv3(x))
 
         # decode 
         # x = self.linear_trans1(x)
         # x = nn.functional.relu(x)
         # x = x.view(32, 4, 4)
-        x = nn.functional.relu(self.conv_trans1(x))
-        x = nn.functional.relu(self.conv_trans2(x))
+        # x = nn.functional.relu(self.conv_trans1(x))
+        x = torch.tanh(self.conv_trans2(x))
+        # x = torch.tanh(self.conv_trans3(x))
         x = nn.functional.relu(self.conv_trans3(x))
         return x
 
@@ -183,7 +187,7 @@ def train(data, learning_rate, model, model_path):
             batch = Variable(batch)
 
             # add some random noise to the input
-            # batch_noisy = batch + torch.normal(mean=0.0, std=0.5, size=batch.shape)
+            batch_noisy = batch + torch.normal(mean=0.0, std=0.1, size=batch.shape)
 
             # forward pass
             output = model(batch)
@@ -272,14 +276,14 @@ def output(model, model_path, input_path, output_path):
         output = model(tranform_func(example))
         output = level_func(output)
         # visualize some tensors 
-        if i % 100 == 0:
-            print("input")
-            join_input(example, input_path + 'textfiles/', "input" + str(i))
-            print("output")
-            join_output_deterministic(output, output_path + 'textfiles/' + str(i) + '.txt')
+        # if i % 100 == 0:
+        #     print("input")
+        #     join_input(example, input_path + 'textfiles/', "input" + str(i))
+        #     print("output")
+        #     join_output_deterministic(output, output_path + 'textfiles/' + str(i) + '.txt')
         i += 1
         level_name = int(f.split("_")[-1].split(".")[0])
-        torch.save(output, '{}/{}'.format(output_path, level_name))
+        torch.save(output, '{}/{}.pth'.format(output_path, level_name))
 
 
 # dataset = load_data()

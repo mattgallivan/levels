@@ -43,13 +43,13 @@ def create_level(level_path, one_hot_tensor_dir, output_path):
                 elif i == "\n":
                     pass
             lines_encoded.append(line_after_encode)
-    print(lines_encoded)
+    # print(lines_encoded)
 
     level_height = len(lines_encoded)
     level_width = len(lines_encoded[0])
 
-    print(level_width)
-    print(level_height)
+    # print(level_width)
+    # print(level_height)
 
     overall_tensor = torch.zeros(level_height, level_width, tiles_len)
 

@@ -58,13 +58,13 @@ def visualize_level(level_file, input_file, output_file):
 				elif i == "\n":
 					pass
 			lines_encoded.append(line_after_encode)
-	print(lines_encoded)
+	# print(lines_encoded)
 
 	level_height = len(lines_encoded)
 	level_width = len(lines_encoded[0])
 
-	print(level_width)
-	print(level_height)
+	# print(level_width)
+	# print(level_height)
 
 	maxX = level_width
 	maxY = level_height

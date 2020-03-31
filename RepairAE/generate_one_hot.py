@@ -32,11 +32,11 @@ def generate_one_hot(level_path, output_path):
                 elif i == "\n":
                     pass
             lines_encoded.append(line_after_encode)
-    print(lines_encoded)
+    # print(lines_encoded)
 
     #Dimensions
-    print(len(lines_encoded))
-    print(len(lines_encoded[0]))
+    # print(len(lines_encoded))
+    # print(len(lines_encoded[0]))
 
     #Window Dimensions
     window_vertical = 8
@@ -58,7 +58,7 @@ def generate_one_hot(level_path, output_path):
                 j = 0
 
             #Chunk created
-            print(window_chunk)
+            # print(window_chunk)
             count+=1
 
             #Creating tensor
@@ -78,8 +78,8 @@ def generate_one_hot(level_path, output_path):
                         #print(tensor_to_produce[tiles_index, iter1, iter2])
                         count1+=1
 
-            print(tensor_to_produce)
-            print(tensor_to_produce.shape)
+            # print(tensor_to_produce)
+            # print(tensor_to_produce.shape)
 
             #saving tensor if required
             torch.save(tensor_to_produce, os.path.join(output_path, 'one_hot_tensor_{name}_{id}.pth'.format(name = filename, id = count)))
