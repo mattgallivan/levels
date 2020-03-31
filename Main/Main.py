@@ -23,12 +23,15 @@ dataLocation = "./data/games/"
 gameOptions = os.listdir(dataLocation)
 generateMethods = ['CNN', 'Pixel']
 repairMethods = ['AutoEncoder', 'MarkovChain']
+pixelMethods = ['img', 'histogram']
+pixelSize = 16
 # TODO: May be some other hyperparameters we want to set here
 
 #user Input
 selectedGame = gameOptions[1]
 selectedGenMethod = generateMethods[1]
 selectedRepairMethod = repairMethods[1]
+selectedMpixelMethods = pixelMethods[0]
 
 # Game data and game pretrained models (should be files):
 asciiLevels, sprites, spriteAsciiMap = Inputs.Get_All_Inputs(dataLocation, selectedGame)
@@ -44,7 +47,7 @@ if(selectedGenMethod == 'CNN'):
     x = 0
 
 if(selectedGenMethod == 'Pixel'):
-    generatedLevel = PixelGen.generate(inputImage_cv, sprites, spriteAsciiMap, 16, 'img')
+    generatedLevel = PixelGen.generate(inputImage_cv, sprites, spriteAsciiMap, pixelSize, selectedMpixelMethods)
     
 # Evaluation 1 ===========================================================================
 # generatedLevel => (values)
