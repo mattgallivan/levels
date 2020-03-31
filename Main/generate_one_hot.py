@@ -12,17 +12,15 @@ def generate_one_hot(level, output_path, levelname, asciiMapping):
     tiles = list(asciiMapping.keys())
     tiles_len = len(tiles)
     
-    lines_encoded = level
-    #for line in lines:
-        #line_after_encode=[]
-        #for eachline in line:
-            #for i in eachline:
-                #if i != "\n":
-                    #line_after_encode.append(i)
-
-                #elif i == "\n":
-                    #pass
-            #lines_encoded.append(line_after_encode)
+    lines_encoded = []
+    for line in level:
+        line_after_encode=[]
+        for i in line:
+            if i != "\n":
+                line_after_encode.append(i)
+            elif i == "\n":
+                pass
+        lines_encoded.append(line_after_encode)
     #print(lines_encoded)
 
     #Dimensions
@@ -75,6 +73,8 @@ def generate_one_hot(level, output_path, levelname, asciiMapping):
             #saving tensor if required
             tensor_save_path = os.path.join(output_path, 'one_hot_tensor_{name}_{id}.pth'.format(name = filename, id = count))
             torch.save(tensor_to_produce, tensor_save_path)
+            if(count>2000):
+                break
 
 
     #Total chunks created
@@ -82,3 +82,5 @@ def generate_one_hot(level, output_path, levelname, asciiMapping):
     print(count)
     print("Total changes made:")
     print(count1)
+    
+    return lines_encoded

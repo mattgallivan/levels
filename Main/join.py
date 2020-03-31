@@ -22,8 +22,11 @@ from pathlib import Path
 # output_tensor = torch.load(input_dir + test_file_name + '.pth')
 # original_tensor = torch.load(original_dir + test_original_file_name + '.pth')
 
-def join_input(tensor, location, file_name, save=False):
+def join_input(tensor, location, file_name, asciiMapping, save=False):
     chunk_decoded = []
+
+    tiles = list(asciiMapping.keys())
+    tiles_len = len(tiles)     
 
     for vertical_iterator in range(tensor.shape[0]):
         line_decoded = []
@@ -39,9 +42,9 @@ def join_input(tensor, location, file_name, save=False):
             line_decoded.append(tile)
         chunk_decoded.append(line_decoded)
 
-    for i in chunk_decoded:
-        print(i)
-        print("")
+    #for i in chunk_decoded:
+        #print(i)
+        #print("")
 
     if save:
         with open(location + file_name + '.txt', "w") as the_file:
@@ -70,9 +73,9 @@ def join_output(tensor, location, file_name, save=False):
             line_decoded.append(tile)
         chunk_decoded.append(line_decoded)
 
-    for i in chunk_decoded:
-        print(i)
-        print("")
+    #for i in chunk_decoded:
+        #print(i)
+        #print("")
 
     if save: 
         with open(location + file_name + '.txt', "w") as the_file:
@@ -81,7 +84,7 @@ def join_output(tensor, location, file_name, save=False):
                     the_file.write(k)
                 the_file.write("\n")
 
-def join_output_deterministic(tensor, file_path, asciiMapping, save=False):
+def join_output_deterministic(tensor, asciiMapping, save=False):
     chunk_decoded = []
     
     tiles = list(asciiMapping.keys())
