@@ -11,6 +11,7 @@ import RepairAE
 import EvaluateMC
 import Visualize
 import PixelGen
+import CNNGen
 
 
 # Inputs ================================================================================
@@ -47,7 +48,7 @@ tempFileLocation = "./Temp_for_AE/"
 # inputImage => generatedLevel
 generatedLevel = []
 if(selectedGenMethod == 'CNN'):
-    x = 0
+    generatedLevel = CNNGen.generate(inputImage_cv, pixelSize)
 
 if(selectedGenMethod == 'Pixel'):
     generatedLevel = PixelGen.generate(inputImage_cv, sprites, spriteAsciiMap, pixelSize, selectedMpixelMethods)

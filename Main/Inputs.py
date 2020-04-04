@@ -27,7 +27,7 @@ def Get_All_Inputs(dataLocation, selectedGame):
 	for filename in glob.glob(spriteLocation):
 		im = Image.open(filename)
 		cv_im = cv2.imread(filename)
-		splits = filename.split("\\")
+		splits = os.path.split(filename)
 		name = splits[-1][:-4]
 		sprites[name] = [im, cv_im]
 	
