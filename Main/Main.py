@@ -9,6 +9,7 @@ import Inputs
 import RepairMC
 import RepairAE
 import EvaluateMC
+import EvaluatePixel
 import Visualize
 import PixelGen
 import CNNGen
@@ -33,7 +34,7 @@ pixelSize = 16
 #user Input
 selectedGame = gameOptions[1]
 selectedGenMethod = generateMethods[1]
-selectedRepairMethod = repairMethods[0]
+selectedRepairMethod = repairMethods[1]
 selectedMpixelMethods = pixelMethods[0]
 
 # Game data and game pretrained models (should be files):
@@ -57,7 +58,8 @@ if(selectedGenMethod == 'Pixel'):
 # generatedLevel => (values)
 generatedImage = Visualize.visualize(generatedLevel, sprites, spriteAsciiMap)
 generatedImage.save("./generatedLevel.jpeg", "JPEG")
-closeGen = EvaluateMC.evaluate(generatedLevel, markovProbabilities)
+consistencyGen = EvaluateMC.evaluate(generatedLevel, markovProbabilities)
+closenessGen = EvaluatePixel.evaluate(inputImage_pil, generatedImage)
 
 # Repair the levels ======================================================================
 # generatedLevel => repairedLevel
@@ -72,8 +74,11 @@ if(selectedRepairMethod == 'MarkovChain'):
 # repairedLevel => (values)
 repairedImage = Visualize.visualize(repairedLevel, sprites, spriteAsciiMap)
 repairedImage.save("./repairedImage.jpeg", "JPEG")
-closeRepair = EvaluateMC.evaluate(repairedLevel, markovProbabilities)
+consistencyRepair = EvaluateMC.evaluate(repairedLevel, markovProbabilities)
+closenessRepair = EvaluatePixel.evaluate(inputImage_pil, repairedImage)
 
 # Plotting ===============================================================================
-print("Closeness After Gen: " + str(closeGen))
-print("Closeness After Repair: " + str(closeRepair))
+print("Conisitency After Gen: " + str(consistencyGen))
+print("Conisitency After Repair: " + str(consistencyRepair))
+print("Closeness After Gen: " + str(closenessGen))
+print("Closeness After Repair: " + str(closenessRepair))
