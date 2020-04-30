@@ -1,7 +1,3 @@
-
-
-
-
 def evaluate(level, markovProbabilities):
 	Good = 0
 	Bad = 0
@@ -37,8 +33,11 @@ def evaluate(level, markovProbabilities):
 			key = north+east+south+west
 			key = key.replace("\n", " ")
 	
-			if key in markovProbabilities.keys():
-				Good += 1
+			if key in markovProbabilities.keys():	
+				if current in markovProbabilities[key].keys():
+					Good += 1
+				else:
+					Bad += 1
 			else:
 				Bad += 1
 	return Good/(Good+Bad)

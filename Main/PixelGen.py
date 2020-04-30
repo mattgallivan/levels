@@ -17,7 +17,8 @@ def compare_game_tiles(tile_repr, sprite_repr, asset_type):
             results[sprite_name] = cv2.compareHist(tile_repr, sprite_img, cv2.HISTCMP_BHATTACHARYYA) #HISTCMP_CORREL
         if asset_type == 'img':
             rmax = np.max([tile_repr.shape[0],sprite_img.shape[0]])
-            cmax = np.max([tile_repr.shape[1],sprite_img.shape[1]])
+            #cmax = np.max([tile_repr.shape[1],sprite_img.shape[1]])
+            cmax = 1
             max_shape = (rmax,cmax,3)
             tile_img = tile_repr
             
@@ -35,13 +36,14 @@ def get_best_tile_ASCII(tile_repr, sprite_repr, sprite_info, asset_type):
     best_sprite_name = compare_game_tiles(tile_repr, sprite_repr, asset_type)
     
     for sprite in sprite_info:
-        if(best_sprite_name == sprite_info[sprite]):
-            return sprite
+        spritList = sprite_info[sprite]
+        for i in range(0, len(spritList)):
+            if(best_sprite_name == spritList[i]):
+                return sprite
     return ' '
 
 def generate(img, sprites, spriteAsciiMap, tile_size = 16, asset_type = 'histogram'):
-    open_cv_image = np.array(img) 
-    opencv_img = open_cv_image[:, :, ::-1].copy()  
+    opencv_img = img
     (r_max, c_max, rgb_max) = opencv_img.shape
     
     # extract_features
@@ -66,7 +68,7 @@ def generate(img, sprites, spriteAsciiMap, tile_size = 16, asset_type = 'histogr
     # Conversions utilizing histograms
     sprites_histogram = {}
     for sprite_name in sprites:
-        sprite_img = sprites[sprite_name]
+        sprite_img = sprites[sprite_name][1]
         sprite_img_cv = np.array(sprite_img) 
         sprite_img_cv = sprite_img_cv[:, :, ::-1].copy()          
         sprites_histogram[sprite_name] = get_histogram_of_image(sprite_img_cv)    
@@ -74,9 +76,9 @@ def generate(img, sprites, spriteAsciiMap, tile_size = 16, asset_type = 'histogr
     # match_assets_into_game_levels
     image_output = []
     for row_of_tiles in histogram_for_tile:
-        row = []
+        row = ''
         for tile_repr in row_of_tiles:
-            row.append(get_best_tile_ASCII(tile_repr, sprites_histogram, spriteAsciiMap, asset_type))
+            row += (get_best_tile_ASCII(tile_repr, sprites_histogram, spriteAsciiMap, asset_type))
         image_output.append(row)
         
     return image_output

@@ -1,6 +1,7 @@
 import os
 import json
 import glob
+import cv2
 
 from PIL import Image
 
@@ -25,14 +26,15 @@ def Get_All_Inputs(dataLocation, selectedGame):
 	sprites = {}
 	for filename in glob.glob(spriteLocation):
 		im = Image.open(filename)
-		splits = filename.split("\\")
+		cv_im = cv2.imread(filename)
+		splits = os.path.split(filename)
 		name = splits[-1][:-4]
-		sprites[name] = im
+		sprites[name] = [im, cv_im]
 	
 	spriteAsciiMap = {}
 	keys = list(asciiList.keys())
 	for i in range(0, len(keys)):
 		key = keys[i]
-		spriteAsciiMap[key] = asciiList[key]['sprites'][0]
+		spriteAsciiMap[key] = asciiList[key]['sprites']
 		
 	return asciiLevels, sprites, spriteAsciiMap
