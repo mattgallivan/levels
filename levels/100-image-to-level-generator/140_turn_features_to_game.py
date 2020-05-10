@@ -93,13 +93,13 @@ def generate_images_from_ascii_files(opts):
     levels_meta = extract_levels_file_meta_from_path(opts['levels_path'])
 
     for game_data in games_data:
-        if game_data['game_info']['path-friendly-name'] == 'super-mario-bros-simplified':
+        if game_data['game_info']['path-friendly-name'] == 'super-mario-bros-simplified' or game_data['game_info']['path-friendly-name'] == 'super-mario-bros-sketch':
             for level_meta in levels_meta:
                 with open(level_meta['full_filename'], "r") as input_file:
                     rows_of_tiles_images = []
                     for line in input_file:
                         rows_of_tiles_images.append(cv2.hconcat(list(map(lambda tChar: game_data['features']['sprites_img'][game_data['tiles'][tChar]['sprites'][0]], line.replace('\n', '')))))
-                    cv2.imwrite(level_meta['path'] + level_meta['filename_wo_extension'] +".png", cv2.vconcat(rows_of_tiles_images))
+                    cv2.imwrite(level_meta['path'] + level_meta['filename_wo_extension'] + '-' + game_data['game_info']['path-friendly-name'][16:] +".png", cv2.vconcat(rows_of_tiles_images))
 
 def extract_levels_file_meta_from_path(start_path):
 
