@@ -14,7 +14,7 @@ def compare_game_tiles(tile_repr, sprite_repr, asset_type):
     for sprite_name in sprite_repr:
         sprite_img = sprite_repr[sprite_name]
         if asset_type == 'histogram':
-            results[sprite_name] = cv2.compareHist(tile_repr, sprite_img, cv2.HISTCMP_BHATTACHARYYA) #HISTCMP_CORREL
+            results[sprite_name] = cv2.compareHist(tile_repr, sprite_img, cv2.HISTCMP_BHATTACHARYYA) #HISTCMP_CORREL #HISTCMP_BHATTACHARYYA
         if asset_type == 'img':
             rmax = np.max([tile_repr.shape[0],sprite_img.shape[0]])
             #cmax = np.max([tile_repr.shape[1],sprite_img.shape[1]])
@@ -30,6 +30,8 @@ def compare_game_tiles(tile_repr, sprite_repr, asset_type):
             results[sprite_name] = np.sum(np.absolute(np.array(tile_img) - np.array(sprite_img)))
 
     results = sorted([(v, k) for (k, v) in results.items()], reverse = False)
+    if(results[0][1] != 'sky'):
+        qqqqqqq = 0
     return results[0][1]
 
 def get_best_tile_ASCII(tile_repr, sprite_repr, sprite_info, asset_type):
@@ -61,7 +63,7 @@ def generate(img, sprites, spriteAsciiMap, tile_size = 16, asset_type = 'histogr
         row = []
         for image in row_of_tiles:
             row.append(get_histogram_of_image(image))
-        histogram_for_tile.append(row)     
+        histogram_for_tile.append(row)
     
     # convert_features_to_games     
     # turn_gaming_sprites_into_histograms 

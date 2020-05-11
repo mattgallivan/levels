@@ -66,7 +66,7 @@ def generate(image, px):
     _, sprites, sprites_ascii_map = Inputs.Get_All_Inputs(game_dir + "/", game_name)
 
     # Convert the levels and images to patches
-    patch_width = 20
+    patch_width = 3
     patch_height = 13
     lvl_patches = []
     img_patches = []
@@ -90,28 +90,42 @@ def generate(image, px):
     # Evaluate the input image using the network
     model.eval()
     image = color.rgb2gray(np.asarray(image))
-    inp_patches = array_to_patches(image, patch_height, patch_width, px)[0:2]
+    inp_patches = array_to_patches(image, patch_height, patch_width, px)#[0:2]
     patched = []
+    #patched_before = []
     for idx in range(0, len(inp_patches), patch_width):
-        out_patch = np.argmax(
-            model(torch.FloatTensor([inp_patches[idx]])).squeeze(0).detach().numpy(), axis=2)
+        input_Patch = inp_patches[idx]
+        out_patch = np.argmax(model(torch.FloatTensor([input_Patch])).squeeze(0).detach().numpy(), axis=2)
         patched.append(out_patch)
+        #patched_before.append(input_Patch)
     result = np.hstack(patched)
     result = [[tiles[t] for t in row] + ['\n'] for row in result]
+    #result_before = np.hstack(patched_before)
+    #result_before = [[tiles[t] for t in row] + ['\n'] for row in result_before]
+
+    #Chris added:
+    newResult = []
+    for i in range(0,len(result)):
+        newRow = ""
+        for j in range(0,len(result[i])):
+            newRow += result[i][j]
+        newResult.append(newRow)
+    result = newResult    
+    
     return result
     
 
 def train(model, criterion, optimizer, x_train, y_train, num_epochs=1, batch_size=32):
     model.train()
     for epoch in range(num_epochs):
-        print("Epoch:", epoch)
+        #print("Epoch:", epoch)
         permutation = torch.randperm(x_train.shape[0])
         for i in range(0, x_train.shape[0], batch_size):
             batch_indices = permutation[i:i + batch_size]
             batch_x, batch_y = x_train[batch_indices], y_train[batch_indices]
             output = model(batch_x)
             loss = criterion(output, batch_y)
-            print(loss)
+            #print(loss)
             optimizer.zero_grad()
             loss.backward()
             optimizer.step()

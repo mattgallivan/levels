@@ -22,20 +22,24 @@ imageFile = "TestImg.jpeg"
 inputImage_pil = Image.open(imageFile)
 inputImage_cv = cv2.imread(imageFile)
 
+dsize = (16*13, 16*200)
+inputImage_pil = inputImage_pil.resize(dsize)
+inputImage_cv = cv2.resize(inputImage_cv, dsize)
+
 # Locations and Methods:
 dataLocation = "./data/games/"
 gameOptions = os.listdir(dataLocation)
 generateMethods = ['CNN', 'Pixel']
-repairMethods = ['AutoEncoder', 'MarkovChain']
 pixelMethods = ['img', 'histogram']
+repairMethods = ['AutoEncoder', 'MarkovChain']
 pixelSize = 16
 # TODO: May be some other hyperparameters we want to set here
 
 #user Input
 selectedGame = gameOptions[1]
 selectedGenMethod = generateMethods[1]
-selectedRepairMethod = repairMethods[1]
 selectedMpixelMethods = pixelMethods[0]
+selectedRepairMethod = repairMethods[1]
 
 # Game data and game pretrained models (should be files):
 asciiLevels, sprites, spriteAsciiMap = Inputs.Get_All_Inputs(dataLocation, selectedGame)
@@ -45,11 +49,16 @@ trainedCNN = []
 trainedAutoEncoder = []
 tempFileLocation = "./Temp_for_AE/"
 
+inputImage_pil.save("./output_images_and_levels/a-originalImage.jpeg", "JPEG")
+
 # Generate the level from the images======================================================
 # inputImage => generatedLevel
 generatedLevel = []
 if(selectedGenMethod == 'CNN'):
-    generatedLevel = CNNGen.generate(inputImage_cv, pixelSize)
+    width, height = inputImage_pil.size
+    output_width = width//pixelSize
+    output_height = height//pixelSize
+    generatedLevel = CNNGen.generate(inputImage_cv, 16)
 
 if(selectedGenMethod == 'Pixel'):
     generatedLevel = PixelGen.generate(inputImage_cv, sprites, spriteAsciiMap, pixelSize, selectedMpixelMethods)
@@ -57,7 +66,7 @@ if(selectedGenMethod == 'Pixel'):
 # Evaluation 1 ===========================================================================
 # generatedLevel => (values)
 generatedImage = Visualize.visualize(generatedLevel, sprites, spriteAsciiMap)
-generatedImage.save("./generatedLevel.jpeg", "JPEG")
+generatedImage.save("./output_images_and_levels/b-generatedLevel.jpeg", "JPEG")
 consistencyGen = EvaluateMC.evaluate(generatedLevel, markovProbabilities)
 closenessGen = EvaluatePixel.evaluate(inputImage_pil, generatedImage)
 
@@ -73,7 +82,7 @@ if(selectedRepairMethod == 'MarkovChain'):
 # Evaluation 2 ===========================================================================
 # repairedLevel => (values)
 repairedImage = Visualize.visualize(repairedLevel, sprites, spriteAsciiMap)
-repairedImage.save("./repairedImage.jpeg", "JPEG")
+repairedImage.save("./output_images_and_levels/c-repairedImage.jpeg", "JPEG")
 consistencyRepair = EvaluateMC.evaluate(repairedLevel, markovProbabilities)
 closenessRepair = EvaluatePixel.evaluate(inputImage_pil, repairedImage)
 
