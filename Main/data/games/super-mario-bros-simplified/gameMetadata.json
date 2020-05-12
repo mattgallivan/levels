@@ -9,7 +9,7 @@
     "tiles" : {
         "X" : {"sprites": ["ground", "stair"], "props": ["solid"]}, 
         "S" : {"sprites": ["brick"], "props": ["solid", "breakable"]}, 
-        "-" : {"sprites": ["sky"], "props": ["blank", "passable"]}, 
+        "-" : {"sprites": ["sky", "sky2", "sky3"], "props": ["blank", "passable"]}, 
         "?" : {"sprites": ["questionMark"], "props":["solid", "question block"]},
         "Q" : {"sprites": ["emptyBlock"], "props": ["solid", "empty", "question block"]}, 
         "E" : {"sprites": ["goomba"], "props": ["enemy", "damaging", "hazard", "moving"]}, 
