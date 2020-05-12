@@ -93,8 +93,8 @@ def join_output_deterministic(tensor, file_path, save=False):
                 #     tile = tiles[2]
                 # else:
                 tile = tiles[torch.argmax(one_hot)]
-                if tile == "b":
-                    tile = "-"
+                # if tile == "b":
+                    # tile = "-"
             line_decoded.append(tile)
         chunk_decoded.append(line_decoded)
 

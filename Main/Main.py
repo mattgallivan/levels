@@ -24,7 +24,7 @@ inputImage_cv = cv2.imread(imageFile)
 
 # Locations and Methods:
 dataLocation = "./data/games/"
-gameOptions = os.listdir(dataLocation)
+gameOptions = sorted(os.listdir(dataLocation))
 generateMethods = ['CNN', 'Pixel']
 repairMethods = ['AutoEncoder', 'MarkovChain']
 pixelMethods = ['img', 'histogram']
@@ -34,7 +34,7 @@ pixelSize = 16
 #user Input
 selectedGame = gameOptions[1]
 selectedGenMethod = generateMethods[1]
-selectedRepairMethod = repairMethods[1]
+selectedRepairMethod = repairMethods[0]
 selectedMpixelMethods = pixelMethods[0]
 
 # Game data and game pretrained models (should be files):

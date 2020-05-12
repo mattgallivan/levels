@@ -53,8 +53,10 @@ def join_input(tensor, location, file_name, asciiMapping, save=False):
                     the_file.write(k)
                 the_file.write("\n")
 
-def join_output(tensor, location, file_name, save=False):
+def join_output(tensor, asciiMapping, save=False):
     chunk_decoded = []
+
+    tiles = list(asciiMapping.keys()) 
 
     for vertical_iterator in range(tensor.shape[0]):
         line_decoded = []
@@ -73,22 +75,23 @@ def join_output(tensor, location, file_name, save=False):
             line_decoded.append(tile)
         chunk_decoded.append(line_decoded)
 
+    return chunk_decoded
+
     #for i in chunk_decoded:
         #print(i)
         #print("")
 
-    if save: 
-        with open(location + file_name + '.txt', "w") as the_file:
-            for listt in chunk_decoded:
-                for k in listt:
-                    the_file.write(k)
-                the_file.write("\n")
+    # if save: 
+    #     with open(location + file_name + '.txt', "w") as the_file:
+    #         for listt in chunk_decoded:
+    #             for k in listt:
+    #                 the_file.write(k)
+    #             the_file.write("\n")
 
 def join_output_deterministic(tensor, asciiMapping, save=False):
     chunk_decoded = []
     
     tiles = list(asciiMapping.keys())
-    tiles_len = len(tiles)   
 
     for vertical_iterator in range(tensor.shape[0]):
         line_decoded = []
@@ -99,8 +102,8 @@ def join_output_deterministic(tensor, asciiMapping, save=False):
                 #     tile = tiles[2]
                 # else:
                 tile = tiles[torch.argmax(one_hot)]
-                if tile == "b":
-                    tile = "-"
+                # if tile == "b":
+                #     tile = "-"
             line_decoded.append(tile)
         chunk_decoded.append(line_decoded)
     
