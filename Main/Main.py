@@ -25,12 +25,10 @@ inputImage_cv = cv2.imread(imageFile)
 w,h = inputImage_pil.size
 
 pixelSize = 16
-outputLevelWidth = w//16
-outputLevelHeight = h//16
+outputLevelWidth = w//pixelSize
+outputLevelHeight = h//pixelSize
 
 dsize = (pixelSize*outputLevelWidth, pixelSize*outputLevelHeight)
-inputImage_pil = inputImage_pil.resize(dsize)
-inputImage_cv = cv2.resize(inputImage_cv, dsize)
 inputImage_pil = inputImage_pil.resize(dsize)
 inputImage_cv = cv2.resize(inputImage_cv, dsize)
 
@@ -40,14 +38,13 @@ gameOptions = sorted(os.listdir(dataLocation))
 generateMethods = ['CNN', 'Pixel']
 pixelMethods = ['img', 'histogram']
 repairMethods = ['AutoEncoder', 'MarkovChain']
-pixelSize = 16
 # TODO: May be some other hyperparameters we want to set here
 
 #user Input
 selectedGame = gameOptions[1]
 selectedGenMethod = generateMethods[1]
 selectedMpixelMethods = pixelMethods[1]
-selectedRepairMethod = repairMethods[0]
+selectedRepairMethod = repairMethods[1]
 
 # Game data and game pretrained models (should be files):
 asciiLevels, sprites, spriteAsciiMap = Inputs.Get_All_Inputs(dataLocation, selectedGame)
