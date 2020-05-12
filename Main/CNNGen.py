@@ -55,6 +55,9 @@ class Network(torch.nn.Module):
 
 
 def generate(image, px):
+    num_epochs = 20
+    batch_size = 16
+    
     # Load the game data
     game_name = "super-mario-bros-simplified"
     game_dir = "data/games"
@@ -85,7 +88,7 @@ def generate(image, px):
     optimizer = torch.optim.Adam(model.parameters(), lr=0.005)
     x_train = torch.FloatTensor(np.array(img_patches))
     y_train = torch.FloatTensor(np.array(lvl_patches))
-    train(model, criterion, optimizer, x_train, y_train, num_epochs=2, batch_size=32)
+    train(model, criterion, optimizer, x_train, y_train, num_epochs, batch_size)
 
     # Evaluate the input image using the network
     model.eval()

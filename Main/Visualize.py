@@ -3,7 +3,7 @@ from PIL import Image
 
 def visualize(level, sprites, spriteAsciiMap):
 	maxY = len(level)
-	maxX = len(level[0])-1 # -1 because of the "\n"	
+	maxX = len(level[0])
 	image = Image.new("RGB", (maxX*16, maxY*16), color=(91, 153, 254))
 	pixels = image.load()
 			

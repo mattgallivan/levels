@@ -22,7 +22,15 @@ imageFile = "TestImg.jpeg"
 inputImage_pil = Image.open(imageFile)
 inputImage_cv = cv2.imread(imageFile)
 
-dsize = (16*13, 16*200)
+w,h = inputImage_pil.size
+
+pixelSize = 16
+outputLevelWidth = w//16
+outputLevelHeight = h//16
+
+dsize = (pixelSize*outputLevelWidth, pixelSize*outputLevelHeight)
+inputImage_pil = inputImage_pil.resize(dsize)
+inputImage_cv = cv2.resize(inputImage_cv, dsize)
 inputImage_pil = inputImage_pil.resize(dsize)
 inputImage_cv = cv2.resize(inputImage_cv, dsize)
 
@@ -38,8 +46,8 @@ pixelSize = 16
 #user Input
 selectedGame = gameOptions[1]
 selectedGenMethod = generateMethods[1]
-selectedMpixelMethods = pixelMethods[0]
-selectedRepairMethod = repairMethods[1]
+selectedMpixelMethods = pixelMethods[1]
+selectedRepairMethod = repairMethods[0]
 
 # Game data and game pretrained models (should be files):
 asciiLevels, sprites, spriteAsciiMap = Inputs.Get_All_Inputs(dataLocation, selectedGame)
@@ -58,7 +66,7 @@ if(selectedGenMethod == 'CNN'):
     width, height = inputImage_pil.size
     output_width = width//pixelSize
     output_height = height//pixelSize
-    generatedLevel = CNNGen.generate(inputImage_cv, 16)
+    generatedLevel = CNNGen.generate(inputImage_cv, pixelSize)
 
 if(selectedGenMethod == 'Pixel'):
     generatedLevel = PixelGen.generate(inputImage_cv, sprites, spriteAsciiMap, pixelSize, selectedMpixelMethods)
