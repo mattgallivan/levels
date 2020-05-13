@@ -63,6 +63,6 @@ def generate(img, sprites, spriteAsciiMap, tile_size = 16, asset_type = 'histogr
                     if(bestAsciiName == spritList[i]):
                         bestAscii = sprite
             row += bestAscii
-        image_output.append(row)
+        image_output.append(row + "\n")
         
     return image_output

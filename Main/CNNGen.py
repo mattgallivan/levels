@@ -54,34 +54,29 @@ class Network(torch.nn.Module):
         return out
 
 
-def generate(image, px):
-    num_epochs = 20
-    batch_size = 16
+def train_model(levels, px, sprites, sprites_ascii_map, model_path, num_epochs, batch_size, patch_width, patch_height):
+    # Load the game data for training
+    #game_name = "super-mario-bros-simplified"
+    #game_dir = "data/games"
+    #lvl_dir = f"{game_dir}/{game_name}/game-levels-ascii"
+    #json_dir = f"{game_dir}/{game_name}"    
+    #with open(f"{json_dir}/gameMetadata.json") as f:
+        #game_data = json.load(f)
+    #_, sprites, sprites_ascii_map = Inputs.Get_All_Inputs(game_dir + "/", game_name)    
     
-    # Load the game data
-    game_name = "super-mario-bros-simplified"
-    game_dir = "data/games"
-    lvl_dir = f"{game_dir}/{game_name}/game-levels-ascii"
-    json_dir = f"{game_dir}/{game_name}"    
-    with open(f"{json_dir}/gameMetadata.json") as f:
-        game_data = json.load(f)
-    tiles = list(game_data["tiles"].keys())
-    _, sprites, sprites_ascii_map = Inputs.Get_All_Inputs(game_dir + "/", game_name)
+    tiles = list(sprites_ascii_map.keys())
 
-    # Convert the levels and images to patches
-    patch_width = 3
-    patch_height = 13
+    # Convert the levels and images to patches for training
     lvl_patches = []
     img_patches = []
-    for lvl_name in os.listdir(lvl_dir):
-        lvl = load_level_as_one_hot(f"{lvl_dir}/{lvl_name}", tiles)
-        lvl_sprites = [[tile for tile in row] + ["\n"] for row in one_hot_to_level(lvl)]
+    for lvl in levels:
+        lvl_one_hot = load_level_as_one_hot(lvl, tiles)
+        lvl_sprites = [[tile for tile in row] + ["\n"] for row in one_hot_to_level(lvl_one_hot, tiles)]
         img = np.array(Visualize.visualize(lvl_sprites, sprites, sprites_ascii_map))
         img = color.rgb2gray(img)
-        lvl_patches.extend(array_to_patches(lvl, patch_height, patch_width, 1))
+        lvl_patches.extend(array_to_patches(lvl_one_hot, patch_height, patch_width, 1))
         img_patches.extend(array_to_patches(img, patch_height, patch_width, px))
     
-
     # Train the model on the levels and images
     model = Network(patch_width, patch_height, len(tiles), px)
     criterion = torch.nn.MSELoss()
@@ -90,12 +85,22 @@ def generate(image, px):
     y_train = torch.FloatTensor(np.array(lvl_patches))
     train(model, criterion, optimizer, x_train, y_train, num_epochs, batch_size)
 
+    torch.save(model.state_dict(), model_path)  
+
+def generate(image, px, sprites_ascii_map, model_path, patch_width, patch_height):
+    
+    tiles = list(sprites_ascii_map.keys())
+    
+    model = Network(patch_width, patch_height, len(tiles), px)
+    model.load_state_dict(torch.load(model_path))
+    
     # Evaluate the input image using the network
     model.eval()
     image = color.rgb2gray(np.asarray(image))
     inp_patches = array_to_patches(image, patch_height, patch_width, px)#[0:2]
     patched = []
     #patched_before = []
+    qqqq = len(inp_patches)
     for idx in range(0, len(inp_patches), patch_width):
         input_Patch = inp_patches[idx]
         out_patch = np.argmax(model(torch.FloatTensor([input_Patch])).squeeze(0).detach().numpy(), axis=2)
@@ -113,7 +118,7 @@ def generate(image, px):
         for j in range(0,len(result[i])):
             newRow += result[i][j]
         newResult.append(newRow)
-    result = newResult    
+    result = newResult
     
     return result
     
@@ -121,14 +126,14 @@ def generate(image, px):
 def train(model, criterion, optimizer, x_train, y_train, num_epochs=1, batch_size=32):
     model.train()
     for epoch in range(num_epochs):
-        #print("Epoch:", epoch)
+        print("Epoch:", epoch)
         permutation = torch.randperm(x_train.shape[0])
         for i in range(0, x_train.shape[0], batch_size):
             batch_indices = permutation[i:i + batch_size]
             batch_x, batch_y = x_train[batch_indices], y_train[batch_indices]
             output = model(batch_x)
             loss = criterion(output, batch_y)
-            #print(loss)
+            print(loss)
             optimizer.zero_grad()
             loss.backward()
             optimizer.step()
@@ -145,19 +150,27 @@ def array_to_patches(arr, height, width, step):
     return patches
 
 
-def load_level_as_one_hot(filepath, game_tiles):
-    with open(filepath, "r") as f:
-        level_tiles = [
-            [game_tiles.index(tile) for tile in line.strip()]
-            for line in f
-        ]
-        height = len(level_tiles)
-        width = len(level_tiles[0])
-        one_hot = np.eye(len(game_tiles))[np.array(level_tiles).reshape(-1)]
-        level = one_hot.reshape(height, width, len(game_tiles))
-        level = level[1:, :]
-        return level
+def load_level_as_one_hot(level_tiles, game_tiles):
+    #with open(filepath, "r") as f:
+    level_tiles = [
+        [game_tiles.index(tile) for tile in line.strip()]
+        for line in level_tiles.values()
+    ]
+    height = len(level_tiles)
+    width = len(level_tiles[0])
+    one_hot = np.eye(len(game_tiles))[np.array(level_tiles).reshape(-1)]
+    level = one_hot.reshape(height, width, len(game_tiles))
+    #level = level[1:, :]
+    return level
 
 
-def one_hot_to_level(one_hot):
-    return np.argmax(one_hot, axis=2)
+def one_hot_to_level(one_hot, game_tiles):
+    level = np.argmax(one_hot, axis=2)
+    #print(level)
+    level_ascii = []
+    for row in level:
+        row_ascii = []
+        for tile in row:
+            row_ascii.append(game_tiles[tile])
+        level_ascii.append(row_ascii)
+    return level_ascii

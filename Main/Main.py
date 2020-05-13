@@ -18,19 +18,22 @@ import CNNGen
 # Inputs ================================================================================
 # Actual image(s):
 imageName = "TestImg"
-imageFile = "TestImg.jpeg"
+imageFile = imageName+".jpeg"
 inputImage_pil = Image.open(imageFile)
 inputImage_cv = cv2.imread(imageFile)
 
 w,h = inputImage_pil.size
 
 pixelSize = 16
+
+# for now it streches or contracts image but maybe cropping would be better or should have an option for either
 outputLevelWidth = w//pixelSize
 outputLevelHeight = h//pixelSize
 
 dsize = (pixelSize*outputLevelWidth, pixelSize*outputLevelHeight)
 inputImage_pil = inputImage_pil.resize(dsize)
 inputImage_cv = cv2.resize(inputImage_cv, dsize)
+inputImage_pil.save("./output_images_and_levels/a-originalImage.jpeg", "JPEG")
 
 # Locations and Methods:
 dataLocation = "./data/games/"
@@ -42,31 +45,37 @@ repairMethods = ['AutoEncoder', 'MarkovChain']
 
 #user Input
 selectedGame = gameOptions[1]
-selectedGenMethod = generateMethods[1]
-selectedMpixelMethods = pixelMethods[1]
+selectedGenMethod = generateMethods[0]
+selectedPixelMethods = pixelMethods[0]
 selectedRepairMethod = repairMethods[1]
+trainModels = True
 
 # Game data and game pretrained models (should be files):
 asciiLevels, sprites, spriteAsciiMap = Inputs.Get_All_Inputs(dataLocation, selectedGame)
 trainedModelLocations = dataLocation + selectedGame + "/trainedModels/"
-markovProbabilities = pickle.load(open(trainedModelLocations + "smbprobabilities.pickle", "rb"))
-trainedCNN = []
+trainedMarkovChain = trainedModelLocations + "smbprobabilities.pickle"
+trainedCNN = trainedModelLocations + "cnn_model"
+patch_width = 20
+patch_height = 14 # Anything other than 14 will need a new stiching method
+CNN_epochs = 20
+CNN_batch = 16
 trainedAutoEncoder = []
 tempFileLocation = "./Temp_for_AE/"
 
-inputImage_pil.save("./output_images_and_levels/a-originalImage.jpeg", "JPEG")
+if(trainModels):
+    RepairMC.train_MC(asciiLevels, trainedMarkovChain)
+    CNNGen.train_model(asciiLevels, pixelSize, sprites, spriteAsciiMap, trainedCNN, CNN_epochs, CNN_batch, patch_width, patch_height)
+
+markovProbabilities = pickle.load(open(trainedMarkovChain, "rb"))
 
 # Generate the level from the images======================================================
 # inputImage => generatedLevel
 generatedLevel = []
 if(selectedGenMethod == 'CNN'):
-    width, height = inputImage_pil.size
-    output_width = width//pixelSize
-    output_height = height//pixelSize
-    generatedLevel = CNNGen.generate(inputImage_cv, pixelSize)
+    generatedLevel = CNNGen.generate(inputImage_cv, pixelSize, spriteAsciiMap, trainedCNN, patch_width, patch_height)
 
 if(selectedGenMethod == 'Pixel'):
-    generatedLevel = PixelGen.generate(inputImage_cv, sprites, spriteAsciiMap, pixelSize, selectedMpixelMethods)
+    generatedLevel = PixelGen.generate(inputImage_cv, sprites, spriteAsciiMap, pixelSize, selectedPixelMethods)
     
 # Evaluation 1 ===========================================================================
 # generatedLevel => (values)
