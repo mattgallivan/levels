@@ -17,7 +17,7 @@ from conv_fully_connected import ConvFullyConnected
 
 # select which model to use and make sure the appropriate path is selected
 model = ConvFullyConnected
-model_path = './autoencoder_weights_test.pth'
+model_path = './autoencoder_weights.pth'
 base_path = './repair_output/'
 #input_path = './PCGML3/levels/mario-1-1.txt'
 
