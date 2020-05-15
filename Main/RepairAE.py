@@ -12,11 +12,11 @@ import repair
 from createleveltry2 import create_level
 from join import join_input, join_output, join_output_deterministic
 from generate_one_hot import generate_one_hot
-from guzdial_autoencoder import GuzdialConvAutoEncoder
+from conv_fully_connected import ConvFullyConnected
 #from visualize_level import visualize_level
 
 # select which model to use and make sure the appropriate path is selected
-model = repair.ConvAutoEncoder
+model = ConvFullyConnected
 model_path = './autoencoder_weights.pth'
 base_path = './repair_output/'
 #input_path = './PCGML3/levels/mario-1-1.txt'
@@ -50,7 +50,7 @@ def Repair(level, output_path, levelname, spriteAsciiMap):
     # 5. turn the tensor back to ASCII 
     repaired_level_tensor = torch.load(output_file)
     #repaired_level_textfile = base_path + 'joined.txt'
-    chunk_decoded = join_output_deterministic(repaired_level_tensor, spriteAsciiMap, save=True) 
+    chunk_decoded = join_output(repaired_level_tensor, spriteAsciiMap, save=True) 
 
     outputLevel = []
     for i in range(0, len(chunk_decoded)):

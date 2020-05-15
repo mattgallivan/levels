@@ -8,18 +8,17 @@ def evaluate(original_img, level_img):
     
     widthO, heightO = original_img.size
     widthL, heightL = level_img.size
-    smallerY = min(heightO, heightL)
-    smallerX = min(widthO, widthL)
+    Y = min(heightO, heightL)
+    X = min(widthO, widthL)
+    Z = max(len(original_pixels[0,0]), len(level_pixels[0,0]))
     
     sumVal = 0
     counter = 0
-    for x in range(0,smallerX):
-        for y in range(0,smallerY):
-            qqq = original_pixels[x,y]
-            sumVal += (original_pixels[x,y][0] - level_pixels[x,y][0])**2
-            sumVal += (original_pixels[x,y][1] - level_pixels[x,y][1])**2
-            sumVal += (original_pixels[x,y][2] - level_pixels[x,y][2])**2
-            counter+=1
+    for x in range(0,X):
+        for y in range(0,Y):
+            for z in range(0,Z):
+                sumVal += (original_pixels[x,y][z] - level_pixels[x,y][z])**2
+                counter+=1
             
     sumVal = math.sqrt(sumVal/counter)
     return sumVal

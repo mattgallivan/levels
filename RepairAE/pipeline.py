@@ -14,7 +14,6 @@ from createleveltry2 import create_level
 from join import join_input, join_output, join_output_deterministic
 from generate_one_hot import generate_one_hot
 from conv_fully_connected import ConvFullyConnected
-from conv_fully_connected_experiment import ConvFullyConnectedExperiment
 from visualize_level import visualize_level
 
 # select which model to use and make sure the appropriate path is selected
@@ -30,14 +29,14 @@ def pipeline(level_path, train=False):
     if train:
         # 1. train the model
         data = repair.load_data()
-        train_data, test_data = repair.split_data(data)
+        # train_data, test_data = repair.split_data(data)
         # labels, data = repair.load_data_categorical()
 
         learning_rate = 1e-4
         # repair.train_categorical(labels, data, learning_rate, model, model_path)
         # repair.eval_categorical(labels, data, model, model_path)
-        repair.train(train_data, learning_rate, model, model_path)
-        repair.eval(test_data, model, model_path)
+        repair.train(data, learning_rate, model, model_path)
+        # repair.eval(test_data, model, model_path)
 
     # 2. generate chunked input tensors
     input_level_path = level_path
@@ -73,5 +72,5 @@ def pipeline(level_path, train=False):
     output_file = base_path + 'joined.jpeg'
     visualize_level(input_level_path, input_file, output_file)
 
-# pipeline('../data/games/super-mario-bros-simplified/game-levels-ascii/mario-1-3.txt', train=False)
+pipeline('../data/games/super-mario-bros-simplified/game-levels-ascii/mario-4-2.txt', train=False)
 # pipeline('./PCGML3/levels_broken/mario-1-3-broken.txt', train=False)

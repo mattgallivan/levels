@@ -19,7 +19,7 @@ if not os.path.exists('./chunked_data'):
 
 # set hyperparameters
 num_epochs = 30
-batch_size = 16
+batch_size = 32
 
 # model dimensions 
 level_width = 8
@@ -122,26 +122,26 @@ class ConvAutoEncoder(nn.Module):
     def __init__(self):
         super(ConvAutoEncoder, self).__init__()
         # encoder
-        self.conv1 = nn.Conv2d(13, 64, kernel_size=2)
-        self.conv2 = nn.Conv2d(64, 128, kernel_size=3)
-        # self.conv3 = nn.Conv2d(64, 128, kernel_size=2)
+        self.conv1 = nn.Conv2d(13, 32, kernel_size=2)
+        self.conv2 = nn.Conv2d(32, 64, kernel_size=3)
+        # self.conv3 = nn.Conv2d(64, 128, kernel_size=3)
         # decoder
-        # self.conv_trans1 = nn.ConvTranspose2d(128, 64, kernel_size=2)
-        self.conv_trans2 = nn.ConvTranspose2d(128, 64, kernel_size=3)
-        self.conv_trans3 = nn.ConvTranspose2d(64, 13, kernel_size=2)
+        # self.conv_trans1 = nn.ConvTranspose2d(128, 64, kernel_size=3)
+        self.conv_trans2 = nn.ConvTranspose2d(64, 32, kernel_size=3)
+        self.conv_trans3 = nn.ConvTranspose2d(32, 13, kernel_size=2)
         self.drop_out = nn.Dropout(p=0.0)
 
     def forward(self, x):
         # encode
         x = torch.tanh(self.conv1(x))
-        x = self.drop_out(x)
         x = torch.tanh(self.conv2(x))
-        # x = nn.functional.relu(self.conv3(x))
+        # x = torch.tanh(self.conv3(x))
+
         # decode 
         # x = self.linear_trans1(x)
         # x = nn.functional.relu(x)
         # x = x.view(32, 4, 4)
-        # x = nn.functional.relu(self.conv_trans1(x))
+        # x = torch.tanh(self.conv_trans1(x))
         x = torch.tanh(self.conv_trans2(x))
         x = nn.functional.relu(self.conv_trans3(x))
         return x
