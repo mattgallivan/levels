@@ -29,6 +29,8 @@ pixelSize = 16
 # for now it streches or contracts image but maybe cropping would be better or should have an option for either
 outputLevelWidth = w//pixelSize
 outputLevelHeight = h//pixelSize
+outputLevelWidth = 202
+outputLevelHeight = 14
 
 dsize = (pixelSize*outputLevelWidth, pixelSize*outputLevelHeight)
 inputImage_pil = inputImage_pil.resize(dsize)
@@ -45,10 +47,10 @@ repairMethods = ['AutoEncoder', 'MarkovChain']
 
 #user Input
 selectedGame = gameOptions[1]
-selectedGenMethod = generateMethods[0]
-selectedPixelMethods = pixelMethods[0]
-selectedRepairMethod = repairMethods[1]
-trainModels = True
+selectedGenMethod = generateMethods[1]
+selectedPixelMethods = pixelMethods[1]
+selectedRepairMethod = repairMethods[0]
+trainModels = False
 
 # Game data and game pretrained models (should be files):
 asciiLevels, sprites, spriteAsciiMap = Inputs.Get_All_Inputs(dataLocation, selectedGame)
