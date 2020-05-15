@@ -1,4 +1,4 @@
-def evaluate(level, markovProbabilities):
+def evaluate(level, markovProbabilities, method):
 	Good = 0
 	Bad = 0
 
@@ -29,8 +29,13 @@ def evaluate(level, markovProbabilities):
 				west = " "
 			else:
 				west = level[y][x-1]
-			
-			key = north+east+south+west
+	
+			if(method == "NS"):
+				key = north+south
+			if(method == "EW"):
+				key = east+west
+			if(method == "NSEW"):
+				key = north+east+south+west
 			key = key.replace("\n", " ")
 	
 			if key in markovProbabilities.keys():	

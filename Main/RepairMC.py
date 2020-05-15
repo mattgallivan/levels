@@ -6,7 +6,10 @@ import glob
 import pickle
 from PIL import Image
 
-def Repair(Badlevel, markovProbabilities, randomSample = True, itterations = 1000, extraCase = False):
+def Repair(Badlevel, trainedMarkovChainLocation, method, randomSample = True, itterations = 1000, extraCase = False, randomOrder = True):
+	
+	markovProbabilities = pickle.load(open(trainedMarkovChainLocation + method + ".pickle", "rb"))	
+	
 	for interationCounter in range(0,itterations):
 		change = False
 		maxY = len(Badlevel)-1	
@@ -18,7 +21,7 @@ def Repair(Badlevel, markovProbabilities, randomSample = True, itterations = 100
 		for y in range(0, maxY):	
 			for x in range(0, maxX):
 				place = len(coordinates)
-				if(place>0):
+				if(place>0 and randomOrder):
 					place = randrange(place)
 				coordinates.insert(place, [x,y])
 		
@@ -42,7 +45,12 @@ def Repair(Badlevel, markovProbabilities, randomSample = True, itterations = 100
 			else:
 				west = Badlevel[y][x-1]
 			
-			key = north+east+south+west
+			if(method == "NS"):
+				key = north+south
+			if(method == "EW"):
+				key = east+west
+			if(method == "NSEW"):
+				key = north+east+south+west
 			key = key.replace("\n", " ")
 	
 			if key in markovProbabilities.keys():	
@@ -117,7 +125,7 @@ def Repair(Badlevel, markovProbabilities, randomSample = True, itterations = 100
 
 
 
-def train_MC(trainingLevels, MC_model_location):
+def train_MC(trainingLevels, method, MC_model_location):
 	#Extract Markov Random Field Counts from Levels
 	markovCounts = {}# Dictionary of (x-1, y), (x-1, y+1), (x, y+1)
 	for level in trainingLevels: 
@@ -147,7 +155,12 @@ def train_MC(trainingLevels, MC_model_location):
 				else:
 					west = level[y][x-1]
 			
-				key = north+east+south+west			
+				if(method == "NS"):
+					key = north+south
+				if(method == "EW"):
+					key = east+west
+				if(method == "NSEW"):
+					key = north+east+south+west
 				key = key.replace("\n", " ")
 				
 				if not key in markovCounts.keys():
@@ -166,4 +179,4 @@ def train_MC(trainingLevels, MC_model_location):
 		for key2 in markovCounts[key].keys():
 			markovProbabilities[key][key2] =markovCounts[key][key2]/sumVal
 			
-	pickle.dump(markovProbabilities, open(MC_model_location, "wb"))
+	pickle.dump(markovProbabilities, open(MC_model_location + method + ".pickle", "wb"))
