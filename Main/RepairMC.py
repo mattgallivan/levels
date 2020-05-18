@@ -6,9 +6,10 @@ import glob
 import pickle
 from PIL import Image
 
-def Repair(Badlevel, trainedMarkovChainLocation, method, randomSample = True, itterations = 1000, extraCase = False, randomOrder = False):
+def Repair(Badlevel, trainedMarkovChainLocation, spriteAsciiMap, method, randomSample = True, itterations = 1000, extraCase = False, randomOrder = True):
 	
 	markovProbabilities = pickle.load(open(trainedMarkovChainLocation + method + ".pickle", "rb"))	
+	tiles = list(spriteAsciiMap.keys())
 	
 	for interationCounter in range(0,itterations):
 		change = False
@@ -18,7 +19,7 @@ def Repair(Badlevel, trainedMarkovChainLocation, method, randomSample = True, it
 		minX = 0
 		
 		coordinates = []
-		for y in range(0, maxY):	
+		for y in range(maxY, 0, -1):
 			for x in range(0, maxX):
 				place = len(coordinates)
 				if(place>0 and randomOrder):
@@ -49,6 +50,10 @@ def Repair(Badlevel, trainedMarkovChainLocation, method, randomSample = True, it
 				key = north+south
 			if(method == "EW"):
 				key = east+west
+			if(method == "SW"):
+				key = south+west
+			if(method == "NE"):
+				key = north+east
 			if(method == "NSEW"):
 				key = north+east+south+west
 			key = key.replace("\n", " ")
@@ -80,7 +85,7 @@ def Repair(Badlevel, trainedMarkovChainLocation, method, randomSample = True, it
 					
 					list_of_possible_key = {}
 					for k in range(0,len(key)):
-						for l in visualization.keys():
+						for l in tiles:
 							if (key[k] != l):
 								new_key = key[0:k]+l+key[k+1:]
 								if new_key in markovProbabilities.keys():
@@ -98,12 +103,12 @@ def Repair(Badlevel, trainedMarkovChainLocation, method, randomSample = True, it
 							Badlevel[y] = Badlevel[y][0:x-1] + replace_surrounding_tiles[3] + Badlevel[y][x:]
 					else:								
 						for k in range(0,len(key)):
-							for l in visualization.keys():
+							for l in tiles:
 								if (key[k] != l):
 									new_key = key[0:k]+l+key[k+1:]
 									if new_key in markovProbabilities.keys():
-										for l in visualization.keys():
-											if level[y][x] != l and l in markovProbabilities[new_key].keys():
+										for l in tiles:
+											if Badlevel[y][x] != l and l in markovProbabilities[new_key].keys():
 												list_of_possible_key[new_key+l] = markovProbabilities[new_key][l]
 						if len(list_of_possible_key)>0:
 							replace_surrounding_tiles = max(list_of_possible_key, key=list_of_possible_key.get)
@@ -159,6 +164,10 @@ def train_MC(trainingLevels, method, MC_model_location):
 					key = north+south
 				if(method == "EW"):
 					key = east+west
+				if(method == "SW"):
+					key = south+west
+				if(method == "NE"):
+					key = north+east
 				if(method == "NSEW"):
 					key = north+east+south+west
 				key = key.replace("\n", " ")

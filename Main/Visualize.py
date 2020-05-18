@@ -25,13 +25,9 @@ def visualize(level, sprites, spriteAsciiMap):
 				pixelsToUse = imageToUse.load()
 				for x2 in range(0, 16):
 					for y2 in range(0, 16):
-						#if pixelsToUse[x2,y2][3]>0:
-						try:
-							qqq = pixelsToUse[x2,y2][0:-1]
-							qq = pixels[x*16+x2,y*16+y2]
-							pixels[x*16+x2,y*16+y2] = pixelsToUse[x2,y2][0:-1]
-						except:
-							continue
+						qqq = pixelsToUse[x2,y2]
+						qq = pixels[x*16+x2,y*16+y2]
+						pixels[x*16+x2,y*16+y2] = pixelsToUse[x2,y2]
 			else:
 				if(level[y][x] == " "):
 					for x2 in range(0, 16):

@@ -21,7 +21,7 @@ print(gameOptions)
 generateMethods = ['CNN', 'Pixel']
 repairMethods = ['AutoEncoder', 'MarkovChain']
 pixelMethods = ['img', 'histogram']
-MCMethods = ["NSEW", "NS", "EW"]
+MCMethods = ["NSEW", "NS", "EW", "SW", "NE"]
 
 # Inputs ================================================================================
 # Actual image(s):
@@ -48,7 +48,7 @@ inputImage_pil.save("./output_images_and_levels/a-originalImage.jpeg", "JPEG")
 # TODO: May be some other hyperparameters we want to set here
 
 #user Input
-selectedGame = gameOptions[3]
+selectedGame = gameOptions[1]
 selectedGenMethod = generateMethods[1]
 selectedRepairMethod = repairMethods[1]
 
@@ -57,7 +57,7 @@ selectedMCMethod = MCMethods[0]
 
 # Training Models=========================================================================
 # Training Info:
-trainModels = False
+trainModels = True
 asciiLevels, sprites, spriteAsciiMap = Inputs.Get_All_Inputs(dataLocation, selectedGame)
 trainedModelLocations = dataLocation + selectedGame + "/trainedModels/"
 
@@ -77,7 +77,7 @@ tempFileLocation = "./Temp_for_AE/"
 if(trainModels):
     for m in MCMethods:
         RepairMC.train_MC(asciiLevels, m, trainedMarkovChain)
-    CNNGen.train_model(asciiLevels, pixelSize, sprites, spriteAsciiMap, trainedCNN, CNN_epochs, CNN_batch, patch_width, patch_height)
+    #CNNGen.train_model(asciiLevels, pixelSize, sprites, spriteAsciiMap, trainedCNN, CNN_epochs, CNN_batch, patch_width, patch_height)
 
 # The MC for eval, not for the repair
 markovProbabilitiesNSEW = pickle.load(open(trainedMarkovChain + MCMethods[0] + ".pickle", "rb"))
@@ -105,7 +105,10 @@ if(selectedRepairMethod == 'AutoEncoder'):
     repairedLevel = RepairAE.Repair(generatedLevel, tempFileLocation, imageName, spriteAsciiMap)
 
 if(selectedRepairMethod == 'MarkovChain'):
-    repairedLevel = RepairMC.Repair(generatedLevel, trainedMarkovChain, selectedMCMethod)
+    repairedLevel = generatedLevel
+    repairedLevel = RepairMC.Repair(repairedLevel, trainedMarkovChain, spriteAsciiMap, "NS")
+    repairedLevel = RepairMC.Repair(repairedLevel, trainedMarkovChain, spriteAsciiMap, "EW")
+    repairedLevel = RepairMC.Repair(repairedLevel, trainedMarkovChain, spriteAsciiMap, selectedMCMethod)
 
 # Evaluation 2 ===========================================================================
 # repairedLevel => (values)

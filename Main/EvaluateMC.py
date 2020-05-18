@@ -30,10 +30,6 @@ def evaluate(level, markovProbabilities, method):
 			else:
 				west = level[y][x-1]
 	
-			if(method == "NS"):
-				key = north+south
-			if(method == "EW"):
-				key = east+west
 			if(method == "NSEW"):
 				key = north+east+south+west
 			key = key.replace("\n", " ")
