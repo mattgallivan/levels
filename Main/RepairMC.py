@@ -6,7 +6,7 @@ import glob
 import pickle
 from PIL import Image
 
-def Repair(Badlevel, trainedMarkovChainLocation, method, randomSample = True, itterations = 1000, extraCase = False, randomOrder = True):
+def Repair(Badlevel, trainedMarkovChainLocation, method, randomSample = True, itterations = 1000, extraCase = False, randomOrder = False):
 	
 	markovProbabilities = pickle.load(open(trainedMarkovChainLocation + method + ".pickle", "rb"))	
 	

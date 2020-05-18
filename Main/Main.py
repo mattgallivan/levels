@@ -14,6 +14,14 @@ import Visualize
 import PixelGen
 import CNNGen
 
+# Locations and Methods:
+dataLocation = "./data/games/"
+gameOptions = sorted(os.listdir(dataLocation))
+print(gameOptions)
+generateMethods = ['CNN', 'Pixel']
+repairMethods = ['AutoEncoder', 'MarkovChain']
+pixelMethods = ['img', 'histogram']
+MCMethods = ["NSEW", "NS", "EW"]
 
 # Inputs ================================================================================
 # Actual image(s):
@@ -37,36 +45,35 @@ inputImage_pil = inputImage_pil.resize(dsize)
 inputImage_cv = cv2.resize(inputImage_cv, dsize)
 inputImage_pil.save("./output_images_and_levels/a-originalImage.jpeg", "JPEG")
 
-# Locations and Methods:
-dataLocation = "./data/games/"
-gameOptions = sorted(os.listdir(dataLocation))
-generateMethods = ['CNN', 'Pixel']
-repairMethods = ['AutoEncoder', 'MarkovChain']
-pixelMethods = ['img', 'histogram']
-MCMethods = ["NSEW", "NS", "EW"]
 # TODO: May be some other hyperparameters we want to set here
 
 #user Input
-selectedGame = gameOptions[1]
+selectedGame = gameOptions[3]
 selectedGenMethod = generateMethods[1]
 selectedRepairMethod = repairMethods[1]
 
 selectedPixelMethods = pixelMethods[1]
 selectedMCMethod = MCMethods[0]
 
-# Game data and game pretrained models (should be files):
+# Training Models=========================================================================
+# Training Info:
 trainModels = False
 asciiLevels, sprites, spriteAsciiMap = Inputs.Get_All_Inputs(dataLocation, selectedGame)
 trainedModelLocations = dataLocation + selectedGame + "/trainedModels/"
-trainedMarkovChain = trainedModelLocations + "smbprobabilities"
-trainedCNN = trainedModelLocations + "cnn_model"
-patch_width = 20
+
+# Hyperparameters
+patch_width = 5
 patch_height = 14 # Anything other than 14 will need a new stiching method for the CNN
 CNN_epochs = 20
 CNN_batch = 16
-trainedAutoEncoder = []
+
+# Trained Model Locations
+trainedCNN = trainedModelLocations + "cnn_model" + "_" + str(patch_width) + "_" + str(patch_height) + ".pth"
+trainedMarkovChain = trainedModelLocations + "smbprobabilities"
+trainedAutoEncoder = trainedModelLocations + "ae_model" + ".pth"
 tempFileLocation = "./Temp_for_AE/"
 
+# Training Methods if required:
 if(trainModels):
     for m in MCMethods:
         RepairMC.train_MC(asciiLevels, m, trainedMarkovChain)

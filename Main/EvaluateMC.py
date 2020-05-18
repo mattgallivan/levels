@@ -45,4 +45,4 @@ def evaluate(level, markovProbabilities, method):
 					Bad += 1
 			else:
 				Bad += 1
-	return Good/(Good+Bad)
+	return Good/(Good+Bad) * 100

@@ -106,7 +106,12 @@ def generate(image, px, sprites_ascii_map, model_path, patch_width, patch_height
         out_patch = np.argmax(model(torch.FloatTensor([input_Patch])).squeeze(0).detach().numpy(), axis=2)
         patched.append(out_patch)
         #patched_before.append(input_Patch)
+        
+    # TODO: THIS striching SHOULD BE CHANGED:
     result = np.hstack(patched)
+    
+    
+    
     result = [[tiles[t] for t in row] + ['\n'] for row in result]
     #result_before = np.hstack(patched_before)
     #result_before = [[tiles[t] for t in row] + ['\n'] for row in result_before]
