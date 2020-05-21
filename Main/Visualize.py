@@ -1,10 +1,10 @@
 import glob
 from PIL import Image
 
-def visualize(level, sprites, spriteAsciiMap):
+def visualize(level, sprites, spriteAsciiMap, pixelSize):
 	maxY = len(level)
 	maxX = len(level[0].rstrip("\n")) # remove the "\n"
-	image = Image.new("RGB", (maxX*16, maxY*16), color=(91, 153, 254))
+	image = Image.new("RGB", (maxX*pixelSize, maxY*pixelSize), color=(91, 153, 254))
 	pixels = image.load()
 
 	for y in range(0, maxY):
@@ -21,15 +21,16 @@ def visualize(level, sprites, spriteAsciiMap):
 					imageToUse = sprites["stair"][0]
 			if not imageToUse == None:
 				pixelsToUse = imageToUse.load()
-				for x2 in range(0, 16):
-					for y2 in range(0, 16):
+				for x2 in range(0, pixelSize):
+					for y2 in range(0, pixelSize):
 						qqq = pixelsToUse[x2,y2]
-						qq = pixels[x*16+x2,y*16+y2]
-						pixels[x*16+x2,y*16+y2] = pixelsToUse[x2,y2]
+						qq = pixels[x*pixelSize+x2,y*pixelSize+y2]
+						pixels[x*pixelSize+x2,y*pixelSize+y2] = pixelsToUse[x2,y2]
 			else:
+				#This part is for adding holes in the level
 				if(level[y][x] == " "):
-					for x2 in range(0, 16):
-						for y2 in range(0, 16):
-							pixels[x*16+x2,y*16+y2] = (0,0,0)
+					for x2 in range(0, pixelSize):
+						for y2 in range(0, pixelSize):
+							pixels[x*pixelSize+x2,y*pixelSize+y2] = (0,0,0)
 	
 	return image

@@ -32,7 +32,7 @@ inputImage_cv = cv2.imread(imageFile)
 
 # for now it streches or contracts image but maybe cropping would be better or should have an option for either
 w,h = inputImage_pil.size
-pixelSize = 16
+pixelSize = 8
 outputLevelWidth = w//pixelSize
 outputLevelHeight = h//pixelSize
 outputLevelWidth = 202
@@ -46,7 +46,7 @@ inputImage_pil.save("./output_images_and_levels/a-originalImage.jpeg", "JPEG")
 # TODO: May be some other hyperparameters we want to set here
 
 #user Input
-selectedGame = gameOptions[1]
+selectedGame = gameOptions[0]
 selectedGenMethod = generateMethods[1]
 selectedRepairMethod = repairMethods[1]
 
@@ -55,7 +55,7 @@ selectedMCMethod = MCMethods[0]
 
 # Training Models=========================================================================
 # Training Info:
-trainModels = False
+trainModels = True
 asciiLevels, sprites, spriteAsciiMap = Inputs.Get_All_Inputs(dataLocation, selectedGame)
 trainedModelLocations = dataLocation + selectedGame + "/trainedModels/"
 
@@ -76,7 +76,7 @@ tempFileLocation = "./Temp_for_AE/"
 if(trainModels):
     for m in MCMethods:
         RepairMC.train_MC(asciiLevels, m, trainedMarkovChain)
-    CNNGen.train_model(asciiLevels, pixelSize, sprites, spriteAsciiMap, trainedCNN, CNN_epochs, CNN_batch, patch_width, patch_height)
+    #CNNGen.train_model(asciiLevels, pixelSize, sprites, spriteAsciiMap, trainedCNN, CNN_epochs, CNN_batch, patch_width, patch_height)
 
 EvaluateMC.trainEval(asciiLevels, trainedEval)
 
@@ -91,7 +91,7 @@ if(selectedGenMethod == 'Pixel'):
     
 # Evaluation 1 ===========================================================================
 # generatedLevel => (values)
-generatedImage = Visualize.visualize(generatedLevel, sprites, spriteAsciiMap)
+generatedImage = Visualize.visualize(generatedLevel, sprites, spriteAsciiMap, pixelSize)
 generatedImage.save("./output_images_and_levels/b-generatedLevel.jpeg", "JPEG")
 consistencyGen = EvaluateMC.evaluate(generatedLevel, trainedEval)
 closenessGen = EvaluatePixel.evaluate(inputImage_pil, generatedImage)
@@ -108,7 +108,7 @@ if(selectedRepairMethod == 'MarkovChain'):
 
 # Evaluation 2 ===========================================================================
 # repairedLevel => (values)
-repairedImage = Visualize.visualize(repairedLevel, sprites, spriteAsciiMap)
+repairedImage = Visualize.visualize(repairedLevel, sprites, spriteAsciiMap, pixelSize)
 repairedImage.save("./output_images_and_levels/c-repairedImage.jpeg", "JPEG")
 consistencyRepair = EvaluateMC.evaluate(repairedLevel, trainedEval)
 closenessRepair = EvaluatePixel.evaluate(inputImage_pil, repairedImage)
