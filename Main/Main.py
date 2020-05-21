@@ -57,13 +57,13 @@ selectedMCMethod = MCMethods[0]
 
 # Training Models=========================================================================
 # Training Info:
-trainModels = True
+trainModels = False
 asciiLevels, sprites, spriteAsciiMap = Inputs.Get_All_Inputs(dataLocation, selectedGame)
 trainedModelLocations = dataLocation + selectedGame + "/trainedModels/"
 
 # Hyperparameters
-patch_width = 5
-patch_height = 14 # Anything other than 14 will need a new stiching method for the CNN
+patch_width = 2
+patch_height = 2 # Anything other than 14 will need a new stiching method for the CNN
 CNN_epochs = 20
 CNN_batch = 16
 
@@ -77,7 +77,7 @@ tempFileLocation = "./Temp_for_AE/"
 if(trainModels):
     for m in MCMethods:
         RepairMC.train_MC(asciiLevels, m, trainedMarkovChain)
-    #CNNGen.train_model(asciiLevels, pixelSize, sprites, spriteAsciiMap, trainedCNN, CNN_epochs, CNN_batch, patch_width, patch_height)
+    CNNGen.train_model(asciiLevels, pixelSize, sprites, spriteAsciiMap, trainedCNN, CNN_epochs, CNN_batch, patch_width, patch_height)
 
 # The MC for eval, not for the repair
 markovProbabilitiesNSEW = pickle.load(open(trainedMarkovChain + MCMethods[0] + ".pickle", "rb"))
