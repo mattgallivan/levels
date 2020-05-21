@@ -3,13 +3,11 @@ from PIL import Image
 
 def visualize(level, sprites, spriteAsciiMap):
 	maxY = len(level)
-	maxX = len(level[0])-1 # remove the "\n"
+	maxX = len(level[0].rstrip("\n")) # remove the "\n"
 	image = Image.new("RGB", (maxX*16, maxY*16), color=(91, 153, 254))
 	pixels = image.load()
 
-	maxY = len(level)
 	for y in range(0, maxY):
-		maxX = len(level[y])
 		for x in range(0, maxX):
 			imageToUse = None
 			if level[y][x] in spriteAsciiMap.keys():

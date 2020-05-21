@@ -6,21 +6,21 @@ import glob
 import pickle
 from PIL import Image
 
-def Repair(Badlevel, trainedMarkovChainLocation, spriteAsciiMap, method, randomSample = True, itterations = 1000, extraCase = False, randomOrder = True):
+def Repair(Badlevel, trainedMarkovChainLocation, spriteAsciiMap, method, randomSample = True, itterations = 1000, extraCase = False, randomOrder = False):
 	
 	markovProbabilities = pickle.load(open(trainedMarkovChainLocation + method + ".pickle", "rb"))	
 	tiles = list(spriteAsciiMap.keys())
 	
 	for interationCounter in range(0,itterations):
 		change = False
-		maxY = len(Badlevel)-1	
-		maxX = len(Badlevel[0])-1
 		minY = 0
 		minX = 0
+		maxY = len(Badlevel)
+		maxX = len(Badlevel[0].rstrip("\n"))
 		
 		coordinates = []
-		for y in range(maxY, 0, -1):
-			for x in range(0, maxX):
+		for y in range(minY, maxY):
+			for x in range(minX, maxX):
 				place = len(coordinates)
 				if(place>0 and randomOrder):
 					place = randrange(place)
@@ -28,8 +28,7 @@ def Repair(Badlevel, trainedMarkovChainLocation, spriteAsciiMap, method, randomS
 		
 		for x,y in coordinates:
 			current = Badlevel[y][x]
-			key = ""
-			if(y+1>maxY):
+			if(y+1>maxY-1):
 				north = " "
 			else:
 				north = Badlevel[y+1][x]
@@ -37,15 +36,16 @@ def Repair(Badlevel, trainedMarkovChainLocation, spriteAsciiMap, method, randomS
 				south = " "
 			else:
 				south = Badlevel[y-1][x]
-			if(x+1>maxX):
+			if(x+1>maxX-1):
 				east = " "
 			else:
 				east = Badlevel[y][x+1]
-			if(x-1>minX):
+			if(x-1<minX):
 				west = " "
 			else:
 				west = Badlevel[y][x-1]
-			
+	
+			key = ""			
 			if(method == "NS"):
 				key = north+south
 			if(method == "EW"):
@@ -132,18 +132,17 @@ def Repair(Badlevel, trainedMarkovChainLocation, spriteAsciiMap, method, randomS
 
 def train_MC(trainingLevels, method, MC_model_location):
 	#Extract Markov Random Field Counts from Levels
-	markovCounts = {}# Dictionary of (x-1, y), (x-1, y+1), (x, y+1)
+	markovCounts = {}
 	for level in trainingLevels: 
 		minY = 0
-		maxY = len(level)-1
+		minX = 0
+		maxY = len(level)
+		maxX = len(level[0].rstrip("\n"))
 		for y in range(0, maxY):
-			minX = 0
-			maxX = len(level[y])-1
 			for x in range(0, maxX):
 				
 				current = level[y][x]
-				key = ""
-				if(y+1>maxY):
+				if(y+1>maxY-1):
 					north = " "
 				else:
 					north = level[y+1][x]
@@ -151,15 +150,16 @@ def train_MC(trainingLevels, method, MC_model_location):
 					south = " "
 				else:
 					south = level[y-1][x]
-				if(x+1>maxX):
+				if(x+1>maxX-1):
 					east = " "
 				else:
 					east = level[y][x+1]
-				if(x-1>minX):
+				if(x-1<minX):
 					west = " "
 				else:
 					west = level[y][x-1]
-			
+	
+				key = ""			
 				if(method == "NS"):
 					key = north+south
 				if(method == "EW"):

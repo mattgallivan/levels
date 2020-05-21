@@ -30,11 +30,9 @@ imageFile = imageName+".jpeg"
 inputImage_pil = Image.open(imageFile)
 inputImage_cv = cv2.imread(imageFile)
 
-w,h = inputImage_pil.size
-
-pixelSize = 16
-
 # for now it streches or contracts image but maybe cropping would be better or should have an option for either
+w,h = inputImage_pil.size
+pixelSize = 16
 outputLevelWidth = w//pixelSize
 outputLevelHeight = h//pixelSize
 outputLevelWidth = 202
@@ -70,6 +68,7 @@ CNN_batch = 16
 # Trained Model Locations
 trainedCNN = trainedModelLocations + "cnn_model" + "_" + str(patch_width) + "_" + str(patch_height) + ".pth"
 trainedMarkovChain = trainedModelLocations + "smbprobabilities"
+trainedEval = trainedModelLocations + "evalDictionary"
 trainedAutoEncoder = trainedModelLocations + "ae_model" + ".pth"
 tempFileLocation = "./Temp_for_AE/"
 
@@ -79,8 +78,7 @@ if(trainModels):
         RepairMC.train_MC(asciiLevels, m, trainedMarkovChain)
     CNNGen.train_model(asciiLevels, pixelSize, sprites, spriteAsciiMap, trainedCNN, CNN_epochs, CNN_batch, patch_width, patch_height)
 
-# The MC for eval, not for the repair
-markovProbabilitiesNSEW = pickle.load(open(trainedMarkovChain + MCMethods[0] + ".pickle", "rb"))
+EvaluateMC.trainEval(asciiLevels, trainedEval)
 
 # Generate the level from the images======================================================
 # inputImage => generatedLevel
@@ -95,7 +93,7 @@ if(selectedGenMethod == 'Pixel'):
 # generatedLevel => (values)
 generatedImage = Visualize.visualize(generatedLevel, sprites, spriteAsciiMap)
 generatedImage.save("./output_images_and_levels/b-generatedLevel.jpeg", "JPEG")
-consistencyGen = EvaluateMC.evaluate(generatedLevel, markovProbabilitiesNSEW, MCMethods[0])
+consistencyGen = EvaluateMC.evaluate(generatedLevel, trainedEval)
 closenessGen = EvaluatePixel.evaluate(inputImage_pil, generatedImage)
 
 # Repair the levels ======================================================================
@@ -106,15 +104,13 @@ if(selectedRepairMethod == 'AutoEncoder'):
 
 if(selectedRepairMethod == 'MarkovChain'):
     repairedLevel = generatedLevel
-    repairedLevel = RepairMC.Repair(repairedLevel, trainedMarkovChain, spriteAsciiMap, "NS")
-    repairedLevel = RepairMC.Repair(repairedLevel, trainedMarkovChain, spriteAsciiMap, "EW")
     repairedLevel = RepairMC.Repair(repairedLevel, trainedMarkovChain, spriteAsciiMap, selectedMCMethod)
 
 # Evaluation 2 ===========================================================================
 # repairedLevel => (values)
 repairedImage = Visualize.visualize(repairedLevel, sprites, spriteAsciiMap)
 repairedImage.save("./output_images_and_levels/c-repairedImage.jpeg", "JPEG")
-consistencyRepair = EvaluateMC.evaluate(repairedLevel, markovProbabilitiesNSEW, MCMethods[0])
+consistencyRepair = EvaluateMC.evaluate(repairedLevel, trainedEval)
 closenessRepair = EvaluatePixel.evaluate(inputImage_pil, repairedImage)
 
 # Plotting ===============================================================================
