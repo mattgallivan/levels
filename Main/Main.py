@@ -20,7 +20,7 @@ gameOptions = sorted(os.listdir(dataLocation))
 print(gameOptions)
 generateMethods = ['CNN', 'Pixel']
 repairMethods = ['AutoEncoder', 'MarkovChain']
-pixelMethods = ['img', 'histogram']
+pixelMethods = ['img', 'histogram', 'avrg']
 MCMethods = ["NSEW", "NS", "EW", "SW", "NE"]
 
 # Inputs ================================================================================
@@ -32,7 +32,7 @@ inputImage_cv = cv2.imread(imageFile)
 
 # for now it streches or contracts image but maybe cropping would be better or should have an option for either
 w,h = inputImage_pil.size
-pixelSize = 8
+pixelSize = 16
 outputLevelWidth = w//pixelSize
 outputLevelHeight = h//pixelSize
 outputLevelWidth = 202
@@ -46,11 +46,11 @@ inputImage_pil.save("./output_images_and_levels/a-originalImage.jpeg", "JPEG")
 # TODO: May be some other hyperparameters we want to set here
 
 #user Input
-selectedGame = gameOptions[0]
+selectedGame = gameOptions[1]
 selectedGenMethod = generateMethods[1]
 selectedRepairMethod = repairMethods[1]
 
-selectedPixelMethods = pixelMethods[1]
+selectedPixelMethods = pixelMethods[2]
 selectedMCMethod = MCMethods[0]
 
 # Training Models=========================================================================
