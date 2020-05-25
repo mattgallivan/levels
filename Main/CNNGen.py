@@ -71,8 +71,8 @@ def train_model(levels, px, sprites, sprites_ascii_map, model_path, num_epochs, 
     img_patches = []
     for lvl in levels:
         lvl_one_hot = load_level_as_one_hot(lvl, tiles)
-        lvl_sprites = [[tile for tile in row] + ["\n"] for row in one_hot_to_level(lvl_one_hot, tiles)]
-        img = np.array(Visualize.visualize(lvl_sprites, sprites, sprites_ascii_map))
+        lvl_sprites = ["".join([tile for tile in row] + ["\n"]) for row in one_hot_to_level(lvl_one_hot, tiles)]
+        img = np.array(Visualize.visualize(lvl_sprites, sprites, sprites_ascii_map, px))
         img = color.rgb2gray(img)
         lvl_patches.extend(array_to_patches(lvl_one_hot, patch_height, patch_width, 1))
         img_patches.extend(array_to_patches(img, patch_height, patch_width, px))
