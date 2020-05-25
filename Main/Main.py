@@ -15,6 +15,14 @@ import Visualize
 import PixelGen
 import CNNGen
 
+# Locations and Methods:
+dataLocation = "./data/games/"
+gameOptions = sorted(os.listdir(dataLocation))
+print(gameOptions)
+generateMethods = ['CNN', 'Pixel']
+repairMethods = ['AutoEncoder', 'MarkovChain']
+pixelMethods = ['img', 'histogram', 'avrg']
+MCMethods = ["NSEW", "NS", "EW", "SW", "NE"]
 
 # Inputs ================================================================================
 # Actual image(s):
@@ -23,54 +31,58 @@ imageFile = imageName+".jpeg"
 inputImage_pil = Image.open(imageFile)
 inputImage_cv = cv2.imread(imageFile)
 
-w,h = inputImage_pil.size
-
-pixelSize = 16
-
 # for now it streches or contracts image but maybe cropping would be better or should have an option for either
+w,h = inputImage_pil.size
+pixelSize = 16
 outputLevelWidth = w//pixelSize
 outputLevelHeight = h//pixelSize
+outputLevelWidth = 202
+outputLevelHeight = 14
 
 dsize = (pixelSize*outputLevelWidth, pixelSize*outputLevelHeight)
 inputImage_pil = inputImage_pil.resize(dsize)
 inputImage_cv = cv2.resize(inputImage_cv, dsize)
 inputImage_pil.save("./output_images_and_levels/a-originalImage.jpeg", "JPEG")
 
-# Locations and Methods:
-dataLocation = "./data/games/"
-gameOptions = sorted(os.listdir(dataLocation))
-generateMethods = ['CNN', 'Pixel']
-pixelMethods = ['img', 'histogram']
-repairMethods = ['AutoEncoder', 'MarkovChain']
 # TODO: May be some other hyperparameters we want to set here
 
 #user Input
 selectedGame = gameOptions[1]
 selectedGenMethod = generateMethods[1]
-selectedPixelMethods = pixelMethods[0]
-selectedRepairMethod = repairMethods[0]
-trainModels = False
+selectedRepairMethod = repairMethods[1]
 
-# Game data and game pretrained models (should be files):
+selectedPixelMethods = pixelMethods[2]
+selectedMCMethod = MCMethods[0]
+
+# Training Models=========================================================================
+# Training Info:
+trainModels = True
 asciiLevels, sprites, spriteAsciiMap = Inputs.Get_All_Inputs(dataLocation, selectedGame)
 trainedModelLocations = dataLocation + selectedGame + "/trainedModels/"
-trainedMarkovChain = trainedModelLocations + "smbprobabilities.pickle"
-trainedCNN = trainedModelLocations + "cnn_model"
-patch_width = 20
-patch_height = 14 # Anything other than 14 will need a new stiching method
-CNN_epochs = 1
+
+# Hyperparameters
+patch_width = 2
+patch_height = 2 # Anything other than 14 will need a new stiching method for the CNN
+CNN_epochs = 20
 CNN_batch = 16
-trainedAutoEncoder = []
+
+# Trained Model Locations
+trainedCNN = trainedModelLocations + "cnn_model" + "_" + str(patch_width) + "_" + str(patch_height) + ".pth"
+trainedMarkovChain = trainedModelLocations + "smbprobabilities"
+trainedEval = trainedModelLocations + "evalDictionary"
+trainedAutoEncoder = trainedModelLocations + "ae_model" + ".pth"
 tempFileLocation = "./Temp_for_AE/"
 # if os.path.exists(tempFileLocation):
 #     shutil.rmtree(tempFileLocation)
 # os.makedirs(tempFileLocation)
 
+# Training Methods if required:
 if(trainModels):
-    RepairMC.train_MC(asciiLevels, trainedMarkovChain)
-    CNNGen.train_model(asciiLevels, pixelSize, sprites, spriteAsciiMap, trainedCNN, CNN_epochs, CNN_batch, patch_width, patch_height)
+    for m in MCMethods:
+        RepairMC.train_MC(asciiLevels, m, trainedMarkovChain)
+    #CNNGen.train_model(asciiLevels, pixelSize, sprites, spriteAsciiMap, trainedCNN, CNN_epochs, CNN_batch, patch_width, patch_height)
 
-markovProbabilities = pickle.load(open(trainedMarkovChain, "rb"))
+EvaluateMC.trainEval(asciiLevels, trainedEval)
 
 # Generate the level from the images======================================================
 # inputImage => generatedLevel
@@ -83,9 +95,9 @@ if(selectedGenMethod == 'Pixel'):
     
 # Evaluation 1 ===========================================================================
 # generatedLevel => (values)
-generatedImage = Visualize.visualize(generatedLevel, sprites, spriteAsciiMap)
+generatedImage = Visualize.visualize(generatedLevel, sprites, spriteAsciiMap, pixelSize)
 generatedImage.save("./output_images_and_levels/b-generatedLevel.jpeg", "JPEG")
-consistencyGen = EvaluateMC.evaluate(generatedLevel, markovProbabilities)
+consistencyGen = EvaluateMC.evaluate(generatedLevel, trainedEval)
 closenessGen = EvaluatePixel.evaluate(inputImage_pil, generatedImage)
 
 # Repair the levels ======================================================================
@@ -95,13 +107,14 @@ if(selectedRepairMethod == 'AutoEncoder'):
     repairedLevel = RepairAE.Repair(generatedLevel, tempFileLocation, imageName, spriteAsciiMap)
 
 if(selectedRepairMethod == 'MarkovChain'):
-    repairedLevel = RepairMC.Repair(generatedLevel, markovProbabilities)
+    repairedLevel = generatedLevel
+    repairedLevel = RepairMC.Repair(repairedLevel, trainedMarkovChain, spriteAsciiMap, selectedMCMethod)
 
 # Evaluation 2 ===========================================================================
 # repairedLevel => (values)
-repairedImage = Visualize.visualize(repairedLevel, sprites, spriteAsciiMap)
+repairedImage = Visualize.visualize(repairedLevel, sprites, spriteAsciiMap, pixelSize)
 repairedImage.save("./output_images_and_levels/c-repairedImage.jpeg", "JPEG")
-consistencyRepair = EvaluateMC.evaluate(repairedLevel, markovProbabilities)
+consistencyRepair = EvaluateMC.evaluate(repairedLevel, trainedEval)
 closenessRepair = EvaluatePixel.evaluate(inputImage_pil, repairedImage)
 
 # Plotting ===============================================================================

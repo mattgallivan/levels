@@ -97,16 +97,34 @@ def generate(image, px, sprites_ascii_map, model_path, patch_width, patch_height
     # Evaluate the input image using the network
     model.eval()
     image = color.rgb2gray(np.asarray(image))
-    inp_patches = array_to_patches(image, patch_height, patch_width, px)#[0:2]
+    inp_patches = array_to_patches(image, patch_height, patch_width, px * patch_width)#[0:2]
     patched = []
     #patched_before = []
-    qqqq = len(inp_patches)
-    for idx in range(0, len(inp_patches), patch_width):
-        input_Patch = inp_patches[idx]
-        out_patch = np.argmax(model(torch.FloatTensor([input_Patch])).squeeze(0).detach().numpy(), axis=2)
-        patched.append(out_patch)
-        #patched_before.append(input_Patch)
-    result = np.hstack(patched)
+    
+    
+    
+    
+    
+    for y in range(0, image.shape[0] - patch_height * px + 1, patch_height * px):
+        patched_row = []
+        for x in range(0, image.shape[1] - patch_width * px + 1, patch_width * px):
+            input_Patch = image[y:y + patch_height * px, x:x + patch_width * px]
+            out_patch = np.argmax(model(torch.FloatTensor([input_Patch])).squeeze(0).detach().numpy(), axis=2)
+            patched_row.append(out_patch)
+        patched.append(np.hstack(patched_row))
+    result = np.vstack(patched)
+    
+    #qqqq = len(inp_patches)
+    #for idy in range(0, len(inp_patches)//patch_height):
+        #for idx in range(0, len(inp_patches), patch_width):
+            #input_Patch = inp_patches[idx]
+            #out_patch = np.argmax(model(torch.FloatTensor([input_Patch])).squeeze(0).detach().numpy(), axis=2)
+            #patched.append(out_patch)
+            ##patched_before.append(input_Patch)
+        
+    ## TODO: THIS striching SHOULD BE CHANGED:
+    #result = np.hstack(patched)
+    
     result = [[tiles[t] for t in row] + ['\n'] for row in result]
     #result_before = np.hstack(patched_before)
     #result_before = [[tiles[t] for t in row] + ['\n'] for row in result_before]
