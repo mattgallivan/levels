@@ -1,4 +1,0 @@
-Conisitency After Gen: 83.0975954738331
-Conisitency After Repair: 97.52475247524752
-Closeness After Gen: 40.94154742234078
-Closeness After Repair: 32.96633150340605

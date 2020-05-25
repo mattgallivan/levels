@@ -34,8 +34,6 @@ imageFile = imageName + ".jpeg"
 inputImage_pil = Image.open(imageFile)
 inputImage_cv = cv2.imread(imageFile)
 
-processString = imageName
-
 # for now it streches or contracts image but maybe cropping would be better or should have an option for either
 w,h = inputImage_pil.size
 pixelSize = 16
@@ -50,7 +48,7 @@ inputImage_cv = cv2.resize(inputImage_cv, dsize)
 
 # Training Models=========================================================================
 # Training Info:
-trainModels = False
+trainModels = True
 asciiLevels, sprites, spriteAsciiMap = Inputs.Get_All_Inputs(dataLocation, selectedGame)
 trainedModelLocations = dataLocation + selectedGame + "/trainedModels/"
 
@@ -81,6 +79,11 @@ EvaluateMC.trainEval(asciiLevels, trainedEval)
 
 # Actual System=============================================================================
 
+outputFolder = "./output_images_and_levels/" + imageName + "_to_" + selectedGame + "/"
+if os.path.exists(outputFolder):
+    shutil.rmtree(outputFolder)
+os.makedirs(outputFolder)
+EvalFile = open(outputFolder + "Evaluations.txt", "a+")
 # user Input
 #selectedGenMethod = generateMethods[1]
 #selectedRepairMethod = repairMethods[1]
@@ -94,8 +97,8 @@ for selectedGenMethod in generateMethods:
 
     for selectedPixelMethod in pixelMethodsList:
         for selectedRepairMethod in repairMethods:
-
-            processString = ("./output_images_and_levels/" + imageName + "_to_" + selectedGame + "_Gen-" + selectedGenMethod + selectedPixelMethod + "_Rep-" + selectedRepairMethod)
+            methodInfoString = "Gen-" + selectedGenMethod + selectedPixelMethod + "_Rep-" + selectedRepairMethod
+            processString = (outputFolder + methodInfoString)
             if not os.path.exists(processString):
                 os.makedirs(processString)
             inputImage_pil.save(processString + "/" + "a_Original_Resized.jpeg", "JPEG")
@@ -145,10 +148,11 @@ for selectedGenMethod in generateMethods:
             #print("Conisitency After Repair: " + str(consistencyRepair))
             #print("Closeness After Gen: " + str(closenessGen))
             #print("Closeness After Repair: " + str(closenessRepair))
-            
-            EvalFile = open(processString + "/" + "d_Eval.txt", "w")
-            EvalFile.write("Conisitency After Gen: " + str(consistencyGen) + "\n")
-            EvalFile.write("Conisitency After Repair: " + str(consistencyRepair) + "\n")
-            EvalFile.write("Closeness After Gen: " + str(closenessGen) + "\n")
-            EvalFile.write("Closeness After Repair: " + str(closenessRepair) + "\n")
-            EvalFile.close()
+
+            EvalFile.write(methodInfoString + " Conisitency After Gen: " + str(consistencyGen) + "\n")
+            EvalFile.write(methodInfoString + " Conisitency After Repair: " + str(consistencyRepair) + "\n")
+            EvalFile.write(methodInfoString + " Closeness After Gen: " + str(closenessGen) + "\n")
+            EvalFile.write(methodInfoString + " Closeness After Repair: " + str(closenessRepair) + "\n")
+            EvalFile.write("\n")
+
+EvalFile.close()
