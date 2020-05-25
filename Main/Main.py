@@ -29,8 +29,8 @@ MCMethods = ["NSEW", "NS", "EW", "SW", "NE"]
 
 # Inputs ================================================================================
 # Actual image(s):
-imageName = "4"
-imageFile = imageName + ".png"
+imageName = "1"
+imageFile = imageName + ".jpeg"
 inputImage_pil = Image.open(imageFile)
 inputImage_cv = cv2.imread(imageFile)
 
@@ -66,9 +66,9 @@ trainedMarkovChain = trainedModelLocations + "smbprobabilities"
 trainedEval = trainedModelLocations + "evalDictionary"
 trainedAutoEncoder = trainedModelLocations + "ae_model" + ".pth"
 tempFileLocation = "./Temp_for_AE/"
-# if os.path.exists(tempFileLocation):
-#     shutil.rmtree(tempFileLocation)
-# os.makedirs(tempFileLocation)
+if os.path.exists(tempFileLocation):
+    shutil.rmtree(tempFileLocation)
+os.makedirs(tempFileLocation)
 
 # Training Methods if required:
 if(trainModels):
