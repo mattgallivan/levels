@@ -10,15 +10,16 @@ from torchvision import transforms
 from torchvision.utils import save_image
 
 import repair
-from createleveltry2 import create_level
+from createleveltry2 import create_level, create_level_stride_2
 from join import join_input, join_output, join_output_deterministic
-from generate_one_hot import generate_one_hot
+from generate_one_hot import generate_one_hot, generate_one_hot_stride_2
 from conv_fully_connected import ConvFullyConnected
 from visualize_level import visualize_level
 
 # select which model to use and make sure the appropriate path is selected
 model = ConvFullyConnected
-model_path = './autoencoder_weights.pth'
+model_name = 'autoencoder_weights_8_8'
+model_path = './{}.pth'.format(model_name)
 base_path = './repair_output/'
 
 # this pipeline is developed to train the network then take a single level file 
@@ -44,7 +45,7 @@ def pipeline(level_path, train=False):
     if os.path.exists(output_path):
        shutil.rmtree(output_path)
     os.makedirs(output_path)
-    generate_one_hot(input_level_path, output_path)
+    generate_one_hot_stride_2(input_level_path, output_path)
 
     # 3. generate chunked output tensors 
     # input_path is a path to the directory containing the one-hot encodings of the level we wish to repair
@@ -58,19 +59,20 @@ def pipeline(level_path, train=False):
     # 4. join the chunks
     chunk_dir = output_path
     # save the file to the output path, this should be a file not a directory
-    output_file = base_path + 'joined.pth'
+    output_file = base_path + '{}_joined.pth'.format(model_name)
     # original file is needed to determine the output dimensions
-    create_level(input_level_path, chunk_dir, output_file)
+    create_level_stride_2(input_level_path, chunk_dir, output_file)
 
     # 5. turn the tensor back to ASCII 
     repaired_level_tensor = torch.load(output_file)
-    repaired_level_textfile = base_path + 'joined.txt'
+    repaired_level_textfile = base_path + '{}_joined.txt'.format(model_name)
     join_output(repaired_level_tensor, repaired_level_textfile, save=True) 
 
     # 6. visualize the output
     input_file = repaired_level_textfile
-    output_file = base_path + 'joined.jpeg'
+    output_file = base_path + '{}_joined.jpeg'.format(model_name)
     visualize_level(input_level_path, input_file, output_file)
 
-pipeline('../data/games/super-mario-bros-simplified/game-levels-ascii/mario-4-2.txt', train=False)
-# pipeline('./PCGML3/levels_broken/mario-1-3-broken.txt', train=False)
+# pipeline('../data/games/super-mario-bros-simplified/game-levels-ascii/mario-3-1.txt', train=False)
+pipeline('./PCGML3/levels_broken/mario-1-3-broken.txt', train=False)
+# pipeline('./mario_levels_even/mario-3-1.txt', train=True)

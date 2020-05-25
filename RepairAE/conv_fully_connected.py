@@ -13,6 +13,7 @@ class ConvFullyConnected(nn.Module):
     def __init__(self):
         super(ConvFullyConnected, self).__init__()
         # encoder
+        self.act = nn.Tanh()
         self.conv1 = nn.Conv2d(13, 64, kernel_size=2)
         self.mp = nn.MaxPool2d(kernel_size=2, stride=2)
         self.conv2 = nn.Conv2d(64, 128, kernel_size=3)
@@ -24,21 +25,60 @@ class ConvFullyConnected(nn.Module):
         self.conv_trans1 = nn.ConvTranspose2d(128, 64, kernel_size=3)
         self.conv_trans2 = nn.ConvTranspose2d(64, 13, kernel_size=2)
 
-        self.drop_out = nn.Dropout(p=0.0)
+        self.drop_out = nn.Dropout(p=0.1)
 
 
     def forward(self, x):
         # encode
-        x = torch.tanh(self.conv1(x))
+        x = self.act(self.conv1(x))
         # x = self.mp(x)
-        x = torch.tanh(self.conv2(x))
+        x = self.act(self.conv2(x))
         # x = self.mp(x)
+        # x = self.drop_out(x)
         x = self.linear1(x.view(x.shape[0], x.shape[1] * x.shape[2] * x.shape[3]))
-        x = torch.tanh(x)
+        # x = torch.tanh(x)
 
         # decode
         x = self.linear_trans1(x)
-        x = torch.tanh(x.view(x.shape[0], 128, 5, 5))
-        x = torch.tanh(self.conv_trans1(x))
+        x = x.view(x.shape[0], 128, 5, 5)
+        x = self.act(self.conv_trans1(x))
+        x = torch.relu(self.conv_trans2(x))
+        return x
+
+embedding_dim_4x4 = 64
+
+class ConvFullyConnected4x4(nn.Module):
+    def __init__(self):
+        super(ConvFullyConnected, self).__init__()
+        # encoder
+        self.act = nn.Tanh()
+        self.conv1 = nn.Conv2d(13, 16, kernel_size=2, padding=1)
+        self.mp1 = nn.MaxPool2d(kernel_size=2, stride=2)
+        self.conv2 = nn.Conv2d(16, 32, kernel_size=2)
+        self.mp2 = nn.MaxPool2d(kernel_size=2, stride=2)
+        self.linear1 = nn.Linear(32 * 2 * 2, embedding_dim_4x4)
+
+
+        # decoder
+        self.linear_trans1 = nn.Linear(embedding_dim_4x4,  32 * 2 * 2) 
+        self.conv_trans1 = nn.ConvTranspose2d(32, 16, kernel_size=2)
+        self.conv_trans2 = nn.ConvTranspose2d(16, 13, kernel_size=2)
+
+        self.drop_out = nn.Dropout(p=0.1)
+
+
+    def forward(self, x):
+        # encode
+        x = self.act(self.conv1(x))
+        # x = self.mp1(x)
+        x = self.act(self.conv2(x))
+        x = self.mp2(x)
+        x = self.linear1(x.view(x.shape[0], x.shape[1] * x.shape[2] * x.shape[3]))
+        # x = torch.tanh(x)
+
+        # decode
+        x = self.linear_trans1(x)
+        x = x.view(x.shape[0], 32, 2, 2)
+        x = self.act(self.conv_trans1(x))
         x = torch.relu(self.conv_trans2(x))
         return x

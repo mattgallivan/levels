@@ -3,6 +3,7 @@ import json
 import glob
 import pickle
 import cv2
+import shutil
 from PIL import Image
 
 import Inputs
@@ -17,7 +18,7 @@ import CNNGen
 
 # Inputs ================================================================================
 # Actual image(s):
-imageName = "TestImg"
+imageName = "Sample"
 imageFile = imageName+".jpeg"
 inputImage_pil = Image.open(imageFile)
 inputImage_cv = cv2.imread(imageFile)
@@ -45,10 +46,10 @@ repairMethods = ['AutoEncoder', 'MarkovChain']
 
 #user Input
 selectedGame = gameOptions[1]
-selectedGenMethod = generateMethods[0]
+selectedGenMethod = generateMethods[1]
 selectedPixelMethods = pixelMethods[0]
-selectedRepairMethod = repairMethods[1]
-trainModels = True
+selectedRepairMethod = repairMethods[0]
+trainModels = False
 
 # Game data and game pretrained models (should be files):
 asciiLevels, sprites, spriteAsciiMap = Inputs.Get_All_Inputs(dataLocation, selectedGame)
@@ -57,10 +58,13 @@ trainedMarkovChain = trainedModelLocations + "smbprobabilities.pickle"
 trainedCNN = trainedModelLocations + "cnn_model"
 patch_width = 20
 patch_height = 14 # Anything other than 14 will need a new stiching method
-CNN_epochs = 20
+CNN_epochs = 1
 CNN_batch = 16
 trainedAutoEncoder = []
 tempFileLocation = "./Temp_for_AE/"
+# if os.path.exists(tempFileLocation):
+#     shutil.rmtree(tempFileLocation)
+# os.makedirs(tempFileLocation)
 
 if(trainModels):
     RepairMC.train_MC(asciiLevels, trainedMarkovChain)
