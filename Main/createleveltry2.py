@@ -165,7 +165,7 @@ def create_level_stride_2(lines_encoded, one_hot_tensor_dir, output_path, asciiM
     # print(lines_encoded)
 
     if is_odd_length:
-         level_width += 1
+        level_width += 1
 
     print(level_width)
     print(level_height)

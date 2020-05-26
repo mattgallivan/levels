@@ -21,34 +21,15 @@ gameOptions = sorted(os.listdir(dataLocation))
 print(gameOptions)
 selectedGame = gameOptions[1]
 
-
 generateMethods = ['CNN', 'Pixel']
 repairMethods = ['AutoEncoder', 'MarkovChain', 'Multi1', 'Multi2']
 pixelMethods = ['img', 'histogram', 'avrg']
 MCMethods = ["NSEW", "NS", "EW", "SW", "NE"]
-
-# Inputs ================================================================================
-# Actual image(s):
-imageName = "1"
-imageFile = imageName + ".jpeg"
-inputImage_pil = Image.open(imageFile)
-inputImage_cv = cv2.imread(imageFile)
-
-# for now it streches or contracts image but maybe cropping would be better or should have an option for either
-w,h = inputImage_pil.size
 pixelSize = 16
-outputLevelWidth = w//pixelSize
-outputLevelHeight = h//pixelSize
-outputLevelWidth = 202
-outputLevelHeight = 14
-
-dsize = (pixelSize*outputLevelWidth, pixelSize*outputLevelHeight)
-inputImage_pil = inputImage_pil.resize(dsize)
-inputImage_cv = cv2.resize(inputImage_cv, dsize)
 
 # Training Models=========================================================================
 # Training Info:
-trainModels = True
+trainModels = False
 asciiLevels, sprites, spriteAsciiMap = Inputs.Get_All_Inputs(dataLocation, selectedGame)
 trainedModelLocations = dataLocation + selectedGame + "/trainedModels/"
 
@@ -76,8 +57,27 @@ if(trainModels):
 
 EvaluateMC.trainEval(asciiLevels, trainedEval)
 
-
 # Actual System=============================================================================
+# Actual image(s):
+# "./input_images_and_levels/Random/"
+# "./input_images_and_levels/Perfect/"
+# "./input_images_and_levels/Sketch/"
+# "./input_images_and_levels/Mario_Levels/"
+imageFile = "./input_images_and_levels/Mario_Levels/mario-1-1--simplified.png"
+imageName = os.path.splitext(os.path.basename(imageFile))[0]
+inputImage_pil = Image.open(imageFile)
+inputImage_cv = cv2.imread(imageFile)
+
+# for now it streches or contracts image but maybe cropping would be better or should have an option for either
+w,h = inputImage_pil.size
+outputLevelWidth = w//pixelSize
+outputLevelHeight = h//pixelSize
+outputLevelWidth = 40
+outputLevelHeight = 14
+
+dsize = (pixelSize*outputLevelWidth, pixelSize*outputLevelHeight)
+inputImage_pil = inputImage_pil.resize(dsize)
+inputImage_cv = cv2.resize(inputImage_cv, dsize)
 
 outputFolder = "./output_images_and_levels/" + imageName + "_to_" + selectedGame + "/"
 if os.path.exists(outputFolder):
@@ -101,7 +101,7 @@ for selectedGenMethod in generateMethods:
             processString = (outputFolder + methodInfoString)
             if not os.path.exists(processString):
                 os.makedirs(processString)
-            inputImage_pil.save(processString + "/" + "a_Original_Resized.jpeg", "JPEG")
+            inputImage_pil.save(processString + "/" + "a_Original_Resized.png", "PNG")
             
             # Generate the level from the images======================================================
             # inputImage => generatedLevel
@@ -115,7 +115,7 @@ for selectedGenMethod in generateMethods:
             # Evaluation 1 ===========================================================================
             # generatedLevel => (values)
             generatedImage = Visualize.visualize(generatedLevel, sprites, spriteAsciiMap, pixelSize)
-            generatedImage.save(processString + "/" + "b_Generated.jpeg", "JPEG")
+            generatedImage.save(processString + "/" + "b_Generated.png", "PNG")
             consistencyGen = EvaluateMC.evaluate(generatedLevel, trainedEval)
             closenessGen = EvaluatePixel.evaluate(inputImage_pil, generatedImage)
             
@@ -139,7 +139,7 @@ for selectedGenMethod in generateMethods:
             # Evaluation 2 ===========================================================================
             # repairedLevel => (values)
             repairedImage=Visualize.visualize(repairedLevel, sprites, spriteAsciiMap, pixelSize)
-            repairedImage.save(processString + "/" + "c_Repaired.jpeg", "JPEG")
+            repairedImage.save(processString + "/" + "c_Repaired.png", "PNG")
             consistencyRepair=EvaluateMC.evaluate(repairedLevel, trainedEval)
             closenessRepair=EvaluatePixel.evaluate(inputImage_pil, repairedImage)
             
