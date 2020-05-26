@@ -4,6 +4,7 @@ import glob
 import pickle
 import cv2
 import shutil
+import csv
 from PIL import Image
 
 import Inputs
@@ -22,14 +23,14 @@ print(gameOptions)
 selectedGame = gameOptions[1]
 
 generateMethods = ['CNN', 'Pixel']
-repairMethods = ['AutoEncoder', 'MarkovChain', 'Multi1', 'Multi2']
+repairMethods = ['AutoEncoder', 'MarkovChain', 'Multi1']
 pixelMethods = ['img', 'histogram', 'avrg']
 MCMethods = ["NSEW", "NS", "EW", "SW", "NE", "NW"]
 pixelSize = 16
 
 # Training Models=========================================================================
 # Training Info:
-trainModels = True
+trainModels = False
 asciiLevels, sprites, spriteAsciiMap = Inputs.Get_All_Inputs(dataLocation, selectedGame)
 trainedModelLocations = dataLocation + selectedGame + "/trainedModels/"
 
@@ -60,12 +61,9 @@ EvaluateMC.trainEval(asciiLevels, trainedEval)
 # Actual System=============================================================================
 # Actual image(s):
 
-# "./input_images_and_levels/Random/"
-# "./input_images_and_levels/Perfect/"
-# "./input_images_and_levels/Sketch/"
-# "./input_images_and_levels/Mario_Levels/"
-for imageFile in glob.glob("./input_images_and_levels/Random/*.png"):
-
+stats = {}
+Img_categories = ["Perfect", "Sketch", "Random"]
+for imageFile in glob.glob("./input_images_and_levels/" + Img_categories[2] + "/*.png"):
     #imageFile = "./input_images_and_levels/Sketch/mario-2-1--sketch-avg_Crop_Sketch.png"
     imageName = os.path.splitext(os.path.basename(imageFile))[0]
     inputImage_pil = Image.open(imageFile)
@@ -154,4 +152,19 @@ for imageFile in glob.glob("./input_images_and_levels/Random/*.png"):
                 EvalFile.write(methodInfoString + " Conisitency After Repair: " + str(consistencyRepair) + "\n")
                 EvalFile.write("\n")
 
+                if not ("Closeness_" + methodInfoString) in stats.keys():
+                    stats["Closeness_" + methodInfoString] = []
+                stats["Closeness_" + methodInfoString] += [closenessRepair]
+		
+                if not ("Conisitency_" + methodInfoString) in stats.keys():
+                    stats["Conisitency_" + methodInfoString] = []
+                stats["Conisitency_" + methodInfoString] += [consistencyRepair]
+
     EvalFile.close()
+
+outputFile = open("output.csv", "w")
+w = csv.writer(outputFile)
+for key, val in stats.items():
+    w.writerow([key])
+    w.writerow([val])
+outputFile.close()
