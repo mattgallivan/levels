@@ -6,7 +6,7 @@ import glob
 import pickle
 from PIL import Image
 
-def Repair(Badlevel, trainedMarkovChainLocation, spriteAsciiMap, method, randomSample = True, itterations = 1000, extraCase = False, randomOrder = False):
+def Repair(Badlevel, trainedMarkovChainLocation, spriteAsciiMap, method, randomSample=True, itterations=1, extraCase=False, randomOrder=False):
 	
 	markovProbabilities = pickle.load(open(trainedMarkovChainLocation + method + ".pickle", "rb"))	
 	tiles = list(spriteAsciiMap.keys())

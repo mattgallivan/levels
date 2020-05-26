@@ -9,9 +9,9 @@ from torchvision import transforms
 from torchvision.utils import save_image
 
 import repair
-from createleveltry2 import create_level
+from createleveltry2 import create_level, create_level_stride_2
 from join import join_input, join_output, join_output_deterministic
-from generate_one_hot import generate_one_hot
+from generate_one_hot import generate_one_hot, generate_one_hot_stride_2
 from conv_fully_connected import ConvFullyConnected
 #from visualize_level import visualize_level
 
@@ -26,7 +26,7 @@ base_path = './repair_output/'
 
 # level path must be the path to a txt file
 def Repair(level, output_path, levelname, spriteAsciiMap):
-    lines_encoded = generate_one_hot(level, output_path, levelname, spriteAsciiMap)
+    lines_encoded, is_odd_length = generate_one_hot_stride_2(level, output_path, levelname, spriteAsciiMap)
     #generate_one_hot(input_level_path, output_path)
 
     # 3. generate chunked output tensors 
@@ -38,6 +38,7 @@ def Repair(level, output_path, levelname, spriteAsciiMap):
     if not os.path.exists(output_path):
         os.makedirs(output_path)
     repair.output(model, model_path, input_path, output_path, spriteAsciiMap)
+    print("finished repair")
 
     # 4. join the chunks
     chunk_dir = output_path
@@ -45,7 +46,7 @@ def Repair(level, output_path, levelname, spriteAsciiMap):
     # output_file = './PCGML3/mario_1-1_broken_output_joined.pth'
     output_file = base_path + 'joined.pth'
     # original file is needed to determine the output dimensions
-    create_level(lines_encoded, chunk_dir, output_file, spriteAsciiMap)
+    create_level_stride_2(lines_encoded, chunk_dir, output_file, spriteAsciiMap, is_odd_length)
     
     # 5. turn the tensor back to ASCII 
     repaired_level_tensor = torch.load(output_file)

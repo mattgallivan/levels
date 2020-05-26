@@ -1,0 +1,80 @@
+Gen-CNNimg_Rep-AutoEncoder Conisitency After Gen: 78.92857142857143
+Gen-CNNimg_Rep-AutoEncoder Conisitency After Repair: 78.21428571428571
+Gen-CNNimg_Rep-AutoEncoder Closeness After Gen: 50.595587474721576
+Gen-CNNimg_Rep-AutoEncoder Closeness After Repair: 52.26636461591423
+
+Gen-CNNimg_Rep-MarkovChain Conisitency After Gen: 78.92857142857143
+Gen-CNNimg_Rep-MarkovChain Conisitency After Repair: 92.85714285714286
+Gen-CNNimg_Rep-MarkovChain Closeness After Gen: 50.595587474721576
+Gen-CNNimg_Rep-MarkovChain Closeness After Repair: 52.384408249770004
+
+Gen-CNNimg_Rep-Multi1 Conisitency After Gen: 78.92857142857143
+Gen-CNNimg_Rep-Multi1 Conisitency After Repair: 92.32142857142858
+Gen-CNNimg_Rep-Multi1 Closeness After Gen: 50.595587474721576
+Gen-CNNimg_Rep-Multi1 Closeness After Repair: 53.63020413510392
+
+Gen-CNNimg_Rep-Multi2 Conisitency After Gen: 78.92857142857143
+Gen-CNNimg_Rep-Multi2 Conisitency After Repair: 92.14285714285714
+Gen-CNNimg_Rep-Multi2 Closeness After Gen: 50.595587474721576
+Gen-CNNimg_Rep-Multi2 Closeness After Repair: 53.31558753375921
+
+Gen-Pixelimg_Rep-AutoEncoder Conisitency After Gen: 88.21428571428571
+Gen-Pixelimg_Rep-AutoEncoder Conisitency After Repair: 99.46428571428572
+Gen-Pixelimg_Rep-AutoEncoder Closeness After Gen: 39.292395933083576
+Gen-Pixelimg_Rep-AutoEncoder Closeness After Repair: 49.269450596599654
+
+Gen-Pixelimg_Rep-MarkovChain Conisitency After Gen: 88.21428571428571
+Gen-Pixelimg_Rep-MarkovChain Conisitency After Repair: 90.89285714285714
+Gen-Pixelimg_Rep-MarkovChain Closeness After Gen: 39.292395933083576
+Gen-Pixelimg_Rep-MarkovChain Closeness After Repair: 40.49785368724878
+
+Gen-Pixelimg_Rep-Multi1 Conisitency After Gen: 88.21428571428571
+Gen-Pixelimg_Rep-Multi1 Conisitency After Repair: 99.82142857142857
+Gen-Pixelimg_Rep-Multi1 Closeness After Gen: 39.292395933083576
+Gen-Pixelimg_Rep-Multi1 Closeness After Repair: 48.98878756137603
+
+Gen-Pixelimg_Rep-Multi2 Conisitency After Gen: 88.21428571428571
+Gen-Pixelimg_Rep-Multi2 Conisitency After Repair: 99.82142857142857
+Gen-Pixelimg_Rep-Multi2 Closeness After Gen: 39.292395933083576
+Gen-Pixelimg_Rep-Multi2 Closeness After Repair: 48.98878756137603
+
+Gen-Pixelhistogram_Rep-AutoEncoder Conisitency After Gen: 97.85714285714285
+Gen-Pixelhistogram_Rep-AutoEncoder Conisitency After Repair: 99.82142857142857
+Gen-Pixelhistogram_Rep-AutoEncoder Closeness After Gen: 39.802750322329814
+Gen-Pixelhistogram_Rep-AutoEncoder Closeness After Repair: 40.17266745643705
+
+Gen-Pixelhistogram_Rep-MarkovChain Conisitency After Gen: 97.85714285714285
+Gen-Pixelhistogram_Rep-MarkovChain Conisitency After Repair: 99.82142857142857
+Gen-Pixelhistogram_Rep-MarkovChain Closeness After Gen: 39.802750322329814
+Gen-Pixelhistogram_Rep-MarkovChain Closeness After Repair: 39.86532480770487
+
+Gen-Pixelhistogram_Rep-Multi1 Conisitency After Gen: 97.85714285714285
+Gen-Pixelhistogram_Rep-Multi1 Conisitency After Repair: 99.82142857142857
+Gen-Pixelhistogram_Rep-Multi1 Closeness After Gen: 39.802750322329814
+Gen-Pixelhistogram_Rep-Multi1 Closeness After Repair: 40.17266745643705
+
+Gen-Pixelhistogram_Rep-Multi2 Conisitency After Gen: 97.85714285714285
+Gen-Pixelhistogram_Rep-Multi2 Conisitency After Repair: 99.64285714285714
+Gen-Pixelhistogram_Rep-Multi2 Closeness After Gen: 39.802750322329814
+Gen-Pixelhistogram_Rep-Multi2 Closeness After Repair: 40.358851225100814
+
+Gen-Pixelavrg_Rep-AutoEncoder Conisitency After Gen: 94.64285714285714
+Gen-Pixelavrg_Rep-AutoEncoder Conisitency After Repair: 98.75
+Gen-Pixelavrg_Rep-AutoEncoder Closeness After Gen: 42.06315338592504
+Gen-Pixelavrg_Rep-AutoEncoder Closeness After Repair: 42.00817459377273
+
+Gen-Pixelavrg_Rep-MarkovChain Conisitency After Gen: 94.64285714285714
+Gen-Pixelavrg_Rep-MarkovChain Conisitency After Repair: 99.10714285714286
+Gen-Pixelavrg_Rep-MarkovChain Closeness After Gen: 42.06315338592504
+Gen-Pixelavrg_Rep-MarkovChain Closeness After Repair: 42.94949579434076
+
+Gen-Pixelavrg_Rep-Multi1 Conisitency After Gen: 94.64285714285714
+Gen-Pixelavrg_Rep-Multi1 Conisitency After Repair: 99.64285714285714
+Gen-Pixelavrg_Rep-Multi1 Closeness After Gen: 42.06315338592504
+Gen-Pixelavrg_Rep-Multi1 Closeness After Repair: 42.48518999660492
+
+Gen-Pixelavrg_Rep-Multi2 Conisitency After Gen: 94.64285714285714
+Gen-Pixelavrg_Rep-Multi2 Conisitency After Repair: 99.64285714285714
+Gen-Pixelavrg_Rep-Multi2 Closeness After Gen: 42.06315338592504
+Gen-Pixelavrg_Rep-Multi2 Closeness After Repair: 43.00927645128542
+
