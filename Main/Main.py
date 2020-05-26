@@ -59,6 +59,9 @@ EvaluateMC.trainEval(asciiLevels, trainedEval)
 
 # Actual System=============================================================================
 # Actual image(s):
+
+for imageFile in glob.glob("./input_images_and_levels/Random/*.png"):
+
 # "./input_images_and_levels/Random/"
 # "./input_images_and_levels/Perfect/"
 # "./input_images_and_levels/Sketch/"
@@ -149,10 +152,10 @@ for selectedGenMethod in generateMethods:
             #print("Closeness After Gen: " + str(closenessGen))
             #print("Closeness After Repair: " + str(closenessRepair))
 
-            EvalFile.write(methodInfoString + " Conisitency After Gen: " + str(consistencyGen) + "\n")
-            EvalFile.write(methodInfoString + " Conisitency After Repair: " + str(consistencyRepair) + "\n")
             EvalFile.write(methodInfoString + " Closeness After Gen: " + str(closenessGen) + "\n")
+            EvalFile.write(methodInfoString + " Conisitency After Gen: " + str(consistencyGen) + "\n")
             EvalFile.write(methodInfoString + " Closeness After Repair: " + str(closenessRepair) + "\n")
+            EvalFile.write(methodInfoString + " Conisitency After Repair: " + str(consistencyRepair) + "\n")
             EvalFile.write("\n")
 
 EvalFile.close()
