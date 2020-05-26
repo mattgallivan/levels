@@ -51,9 +51,11 @@ def Repair(Badlevel, trainedMarkovChainLocation, spriteAsciiMap, method, randomS
 			if(method == "EW"):
 				key = east+west
 			if(method == "SW"):
-				key = south+west
+				key = south + west
 			if(method == "NE"):
-				key = north+east
+				key = north + east
+			if(method == "NW"):
+				key = north + west
 			if(method == "NSEW"):
 				key = north+east+south+west
 			key = key.replace("\n", " ")
@@ -168,6 +170,8 @@ def train_MC(trainingLevels, method, MC_model_location):
 					key = south+west
 				if(method == "NE"):
 					key = north+east
+				if(method == "NW"):
+					key = north + west
 				if(method == "NSEW"):
 					key = north+east+south+west
 				key = key.replace("\n", " ")

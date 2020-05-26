@@ -24,12 +24,12 @@ selectedGame = gameOptions[1]
 generateMethods = ['CNN', 'Pixel']
 repairMethods = ['AutoEncoder', 'MarkovChain', 'Multi1', 'Multi2']
 pixelMethods = ['img', 'histogram', 'avrg']
-MCMethods = ["NSEW", "NS", "EW", "SW", "NE"]
+MCMethods = ["NSEW", "NS", "EW", "SW", "NE", "NW"]
 pixelSize = 16
 
 # Training Models=========================================================================
 # Training Info:
-trainModels = False
+trainModels = True
 asciiLevels, sprites, spriteAsciiMap = Inputs.Get_All_Inputs(dataLocation, selectedGame)
 trainedModelLocations = dataLocation + selectedGame + "/trainedModels/"
 
@@ -51,111 +51,107 @@ os.makedirs(tempFileLocation)
 
 # Training Methods if required:
 if(trainModels):
-    for m in MCMethods:
-        RepairMC.train_MC(asciiLevels, m, trainedMarkovChain)
     CNNGen.train_model(asciiLevels, pixelSize, sprites, spriteAsciiMap, trainedCNN, CNN_epochs, CNN_batch, patch_width, patch_height)
 
+for m in MCMethods:
+    RepairMC.train_MC(asciiLevels, m, trainedMarkovChain)
 EvaluateMC.trainEval(asciiLevels, trainedEval)
 
 # Actual System=============================================================================
 # Actual image(s):
 
-for imageFile in glob.glob("./input_images_and_levels/Random/*.png"):
-
 # "./input_images_and_levels/Random/"
 # "./input_images_and_levels/Perfect/"
 # "./input_images_and_levels/Sketch/"
 # "./input_images_and_levels/Mario_Levels/"
-imageFile = "./input_images_and_levels/Mario_Levels/mario-1-1--simplified.png"
-imageName = os.path.splitext(os.path.basename(imageFile))[0]
-inputImage_pil = Image.open(imageFile)
-inputImage_cv = cv2.imread(imageFile)
+for imageFile in glob.glob("./input_images_and_levels/Random/*.png"):
 
-# for now it streches or contracts image but maybe cropping would be better or should have an option for either
-w,h = inputImage_pil.size
-outputLevelWidth = w//pixelSize
-outputLevelHeight = h//pixelSize
-outputLevelWidth = 40
-outputLevelHeight = 14
+    #imageFile = "./input_images_and_levels/Sketch/mario-2-1--sketch-avg_Crop_Sketch.png"
+    imageName = os.path.splitext(os.path.basename(imageFile))[0]
+    inputImage_pil = Image.open(imageFile)
+    inputImage_cv = cv2.imread(imageFile)
 
-dsize = (pixelSize*outputLevelWidth, pixelSize*outputLevelHeight)
-inputImage_pil = inputImage_pil.resize(dsize)
-inputImage_cv = cv2.resize(inputImage_cv, dsize)
+    # for now it streches or contracts image but maybe cropping would be better or should have an option for either
+    w, h = inputImage_pil.size
+    outputLevelWidth = w // pixelSize
+    outputLevelHeight = h // pixelSize
+    outputLevelWidth = 40
+    outputLevelHeight = 14
 
-outputFolder = "./output_images_and_levels/" + imageName + "_to_" + selectedGame + "/"
-if os.path.exists(outputFolder):
-    shutil.rmtree(outputFolder)
-os.makedirs(outputFolder)
-EvalFile = open(outputFolder + "Evaluations.txt", "a+")
-# user Input
-#selectedGenMethod = generateMethods[1]
-#selectedRepairMethod = repairMethods[1]
-#selectedPixelMethod = pixelMethods[2]
-selectedMCMethod = MCMethods[0]
-for selectedGenMethod in generateMethods:
-    if(selectedGenMethod == 'Pixel'):
-        pixelMethodsList = pixelMethods
-    else:
-        pixelMethodsList = ['img']
+    dsize = (pixelSize * outputLevelWidth, pixelSize * outputLevelHeight)
+    inputImage_pil = inputImage_pil.resize(dsize)
+    inputImage_cv = cv2.resize(inputImage_cv, dsize)
 
-    for selectedPixelMethod in pixelMethodsList:
-        for selectedRepairMethod in repairMethods:
-            methodInfoString = "Gen-" + selectedGenMethod + selectedPixelMethod + "_Rep-" + selectedRepairMethod
-            processString = (outputFolder + methodInfoString)
-            if not os.path.exists(processString):
-                os.makedirs(processString)
-            inputImage_pil.save(processString + "/" + "a_Original_Resized.png", "PNG")
-            
-            # Generate the level from the images======================================================
-            # inputImage => generatedLevel
-            generatedLevel = []
-            if(selectedGenMethod == 'CNN'):
-                generatedLevel = CNNGen.generate(inputImage_cv, pixelSize, spriteAsciiMap, trainedCNN, patch_width, patch_height)
-            
-            if(selectedGenMethod == 'Pixel'):
-                generatedLevel = PixelGen.generate(inputImage_cv, sprites, spriteAsciiMap, pixelSize, selectedPixelMethod)
-                
-            # Evaluation 1 ===========================================================================
-            # generatedLevel => (values)
-            generatedImage = Visualize.visualize(generatedLevel, sprites, spriteAsciiMap, pixelSize)
-            generatedImage.save(processString + "/" + "b_Generated.png", "PNG")
-            consistencyGen = EvaluateMC.evaluate(generatedLevel, trainedEval)
-            closenessGen = EvaluatePixel.evaluate(inputImage_pil, generatedImage)
-            
-            # Repair the levels ======================================================================
-            # generatedLevel => repairedLevel
-            repairedLevel=generatedLevel
-            if(selectedRepairMethod == 'AutoEncoder'):
-                repairedLevel = RepairAE.Repair(repairedLevel, tempFileLocation, imageName, spriteAsciiMap)
-            
-            if(selectedRepairMethod == 'MarkovChain'):
-                repairedLevel = RepairMC.Repair(repairedLevel, trainedMarkovChain, spriteAsciiMap, selectedMCMethod)
-            
-            if(selectedRepairMethod == 'Multi1'):
-                repairedLevel = RepairAE.Repair(repairedLevel, tempFileLocation, imageName, spriteAsciiMap)
-                repairedLevel = RepairMC.Repair(repairedLevel, trainedMarkovChain, spriteAsciiMap, selectedMCMethod)
-            
-            if(selectedRepairMethod == 'Multi2'):
-                repairedLevel = RepairMC.Repair(repairedLevel, trainedMarkovChain, spriteAsciiMap, selectedMCMethod)
-                repairedLevel = RepairAE.Repair(repairedLevel, tempFileLocation, imageName, spriteAsciiMap)
-            
-            # Evaluation 2 ===========================================================================
-            # repairedLevel => (values)
-            repairedImage=Visualize.visualize(repairedLevel, sprites, spriteAsciiMap, pixelSize)
-            repairedImage.save(processString + "/" + "c_Repaired.png", "PNG")
-            consistencyRepair=EvaluateMC.evaluate(repairedLevel, trainedEval)
-            closenessRepair=EvaluatePixel.evaluate(inputImage_pil, repairedImage)
-            
-            # Plotting ===============================================================================
-            #print("Conisitency After Gen: " + str(consistencyGen))
-            #print("Conisitency After Repair: " + str(consistencyRepair))
-            #print("Closeness After Gen: " + str(closenessGen))
-            #print("Closeness After Repair: " + str(closenessRepair))
+    outputFolder = "./output_images_and_levels/" + imageName + "_to_" + selectedGame + "/"
+    if os.path.exists(outputFolder):
+        shutil.rmtree(outputFolder)
+    os.makedirs(outputFolder)
+    EvalFile = open(outputFolder + "Evaluations.txt", "a+")
+    # user Input
+    #selectedGenMethod = generateMethods[1]
+    #selectedRepairMethod = repairMethods[1]
+    #selectedPixelMethod = pixelMethods[2]
+    selectedMCMethod = MCMethods[3]
+    for selectedGenMethod in generateMethods:
+        if(selectedGenMethod == 'Pixel'):
+            pixelMethodsList = pixelMethods
+        else:
+            pixelMethodsList = ['img']
 
-            EvalFile.write(methodInfoString + " Closeness After Gen: " + str(closenessGen) + "\n")
-            EvalFile.write(methodInfoString + " Conisitency After Gen: " + str(consistencyGen) + "\n")
-            EvalFile.write(methodInfoString + " Closeness After Repair: " + str(closenessRepair) + "\n")
-            EvalFile.write(methodInfoString + " Conisitency After Repair: " + str(consistencyRepair) + "\n")
-            EvalFile.write("\n")
+        for selectedPixelMethod in pixelMethodsList:
+            for selectedRepairMethod in repairMethods:
+                methodInfoString = "Gen-" + selectedGenMethod + selectedPixelMethod + "_Rep-" + selectedRepairMethod
+                processString = (outputFolder + methodInfoString)
+                if not os.path.exists(processString):
+                    os.makedirs(processString)
+                inputImage_pil.save(processString + "/" + "a_Original_Resized.png", "PNG")
 
-EvalFile.close()
+                # Generate the level from the images======================================================
+                # inputImage => generatedLevel
+                generatedLevel = []
+                if(selectedGenMethod == 'CNN'):
+                    generatedLevel = CNNGen.generate(inputImage_cv, pixelSize, spriteAsciiMap, trainedCNN, patch_width, patch_height)
+
+                if(selectedGenMethod == 'Pixel'):
+                    generatedLevel = PixelGen.generate(inputImage_cv, sprites, spriteAsciiMap, pixelSize, selectedPixelMethod)
+
+                # Evaluation 1 ===========================================================================
+                # generatedLevel => (values)
+                generatedImage = Visualize.visualize(generatedLevel, sprites, spriteAsciiMap, pixelSize)
+                generatedImage.save(processString + "/" + "b_Generated.png", "PNG")
+                consistencyGen = EvaluateMC.evaluate(generatedLevel, trainedEval)
+                closenessGen = EvaluatePixel.evaluate(inputImage_pil, generatedImage)
+
+                # Repair the levels ======================================================================
+                # generatedLevel => repairedLevel
+                repairedLevel = generatedLevel
+                if(selectedRepairMethod == 'AutoEncoder'):
+                    repairedLevel = RepairAE.Repair(repairedLevel, tempFileLocation, imageName, spriteAsciiMap)
+
+                if(selectedRepairMethod == 'MarkovChain'):
+                    repairedLevel = RepairMC.Repair(repairedLevel, trainedMarkovChain, spriteAsciiMap, selectedMCMethod)
+
+                if(selectedRepairMethod == 'Multi1'):
+                    repairedLevel = RepairAE.Repair(repairedLevel, tempFileLocation, imageName, spriteAsciiMap)
+                    repairedLevel = RepairMC.Repair(repairedLevel, trainedMarkovChain, spriteAsciiMap, selectedMCMethod)
+
+                # Evaluation 2 ===========================================================================
+                # repairedLevel => (values)
+                repairedImage = Visualize.visualize(repairedLevel, sprites, spriteAsciiMap, pixelSize)
+                repairedImage.save(processString + "/" + "c_Repaired.png", "PNG")
+                consistencyRepair = EvaluateMC.evaluate(repairedLevel, trainedEval)
+                closenessRepair = EvaluatePixel.evaluate(inputImage_pil, repairedImage)
+
+                # Plotting ===============================================================================
+                #print("Conisitency After Gen: " + str(consistencyGen))
+                #print("Conisitency After Repair: " + str(consistencyRepair))
+                #print("Closeness After Gen: " + str(closenessGen))
+                #print("Closeness After Repair: " + str(closenessRepair))
+
+                EvalFile.write(methodInfoString + " Closeness After Gen: " + str(closenessGen) + "\n")
+                EvalFile.write(methodInfoString + " Conisitency After Gen: " + str(consistencyGen) + "\n")
+                EvalFile.write(methodInfoString + " Closeness After Repair: " + str(closenessRepair) + "\n")
+                EvalFile.write(methodInfoString + " Conisitency After Repair: " + str(consistencyRepair) + "\n")
+                EvalFile.write("\n")
+
+    EvalFile.close()
