@@ -191,9 +191,9 @@ def create_level_stride_2(lines_encoded, one_hot_tensor_dir, output_path, asciiM
                 #print(horizontal_counter)
 
                 if tensor_iterator == 0 and vertical_counter == 0 and horizontal_counter == 0:
-                    h_counter = 0
                     v_counter = 0
                     for vertical_iterator in range(test_tensor.shape[0]):
+                        h_counter = 0
                         for horizontal_iterator in range(test_tensor.shape[1]):
                             overall_tensor[v_counter, h_counter, :] = test_tensor[vertical_iterator, horizontal_iterator, :]
                             h_counter+=1
