@@ -1,0 +1,36 @@
+Gen-CNNimg_Rep-AutoEncoder LevelCheck After Gen: 97.85714285714285
+Gen-CNNimg_Rep-AutoEncoder LevelCheck After Repair: 97.67857142857143
+
+Gen-CNNimg_Rep-MarkovChain LevelCheck After Gen: 97.85714285714285
+Gen-CNNimg_Rep-MarkovChain LevelCheck After Repair: 97.85714285714285
+
+Gen-CNNimg_Rep-Multi1 LevelCheck After Gen: 97.85714285714285
+Gen-CNNimg_Rep-Multi1 LevelCheck After Repair: 97.85714285714285
+
+Gen-Pixelimg_Rep-AutoEncoder LevelCheck After Gen: 100.0
+Gen-Pixelimg_Rep-AutoEncoder LevelCheck After Repair: 99.82142857142857
+
+Gen-Pixelimg_Rep-MarkovChain LevelCheck After Gen: 100.0
+Gen-Pixelimg_Rep-MarkovChain LevelCheck After Repair: 100.0
+
+Gen-Pixelimg_Rep-Multi1 LevelCheck After Gen: 100.0
+Gen-Pixelimg_Rep-Multi1 LevelCheck After Repair: 99.82142857142857
+
+Gen-Pixelhistogram_Rep-AutoEncoder LevelCheck After Gen: 100.0
+Gen-Pixelhistogram_Rep-AutoEncoder LevelCheck After Repair: 99.82142857142857
+
+Gen-Pixelhistogram_Rep-MarkovChain LevelCheck After Gen: 100.0
+Gen-Pixelhistogram_Rep-MarkovChain LevelCheck After Repair: 100.0
+
+Gen-Pixelhistogram_Rep-Multi1 LevelCheck After Gen: 100.0
+Gen-Pixelhistogram_Rep-Multi1 LevelCheck After Repair: 99.82142857142857
+
+Gen-Pixelavrg_Rep-AutoEncoder LevelCheck After Gen: 100.0
+Gen-Pixelavrg_Rep-AutoEncoder LevelCheck After Repair: 99.82142857142857
+
+Gen-Pixelavrg_Rep-MarkovChain LevelCheck After Gen: 100.0
+Gen-Pixelavrg_Rep-MarkovChain LevelCheck After Repair: 100.0
+
+Gen-Pixelavrg_Rep-Multi1 LevelCheck After Gen: 100.0
+Gen-Pixelavrg_Rep-Multi1 LevelCheck After Repair: 99.82142857142857
+
