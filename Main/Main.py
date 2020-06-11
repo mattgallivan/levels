@@ -33,6 +33,7 @@ pixelSize = 16
 # Training Info:
 trainModels = False
 asciiLevels, sprites, spriteAsciiMap = Inputs.Get_All_Inputs(dataLocation, selectedGame)
+asciiLevelsSMB2, spritesSMB2, spriteAsciiMapSMB2 = Inputs.Get_All_Inputs(dataLocation, "super-mario-bros-2-simplified")
 trainedModelLocations = dataLocation + selectedGame + "/trainedModels/"
 
 # Hyperparameters
@@ -64,7 +65,7 @@ EvaluateMC.trainEval(asciiLevels, trainedEval)
 
 stats = {}
 categories = ["SuperMarioBros2(J)-World", "mario"]
-selectedCategory = categories[1]
+selectedCategory = categories[0]
 for testFile in glob.glob("./input_test_files/" + selectedCategory + "*.txt"):
 
     #imageFile = "./input_images_and_levels/Sketch/mario-2-1--sketch-avg_Crop_Sketch.png"
@@ -75,7 +76,7 @@ for testFile in glob.glob("./input_test_files/" + selectedCategory + "*.txt"):
             testLevel.append(line)
             y += 1
     imageName = os.path.splitext(os.path.basename(testFile))[0]
-    testImage = Visualize.visualize(testLevel, sprites, spriteAsciiMap, pixelSize)
+    testImage = Visualize.visualize(testLevel, spritesSMB2, spriteAsciiMap, pixelSize)
     imageFile = "./input_test_files/" + imageName + ".png"
     testImage.save(imageFile, "PNG")
     
@@ -113,7 +114,7 @@ for testFile in glob.glob("./input_test_files/" + selectedCategory + "*.txt"):
     if os.path.exists(outputFolder):
         shutil.rmtree(outputFolder)
     os.makedirs(outputFolder)
-    EvalFile=open(outputFolder + "Evaluations.txt", "a+")
+    #EvalFile=open(outputFolder + "Evaluations.txt", "a+")
     # user Input
     # selectedGenMethod = generateMethods[1]
     # selectedRepairMethod = repairMethods[1]
@@ -126,29 +127,49 @@ for testFile in glob.glob("./input_test_files/" + selectedCategory + "*.txt"):
             pixelMethodsList=['img']
 
         for selectedPixelMethod in pixelMethodsList:
+            GenMethodInfostring = "Gen-" + selectedGenMethod + selectedPixelMethod
+            GenProcessString = (outputFolder + GenMethodInfostring)
+            if not os.path.exists(GenProcessString):
+                os.makedirs(GenProcessString)
+            inputImage_pil.save(GenProcessString + "/" + "a_Original_Resized.png", "PNG")
+            
+            # Generate the level from the images======================================================
+            # inputImage => generatedLevel
+            generatedLevel=[]
+            if(selectedGenMethod == 'CNN'):
+                generatedLevel=CNNGen.generate(inputImage_cv, pixelSize, spriteAsciiMap, trainedCNN, patch_width, patch_height)
+
+            if(selectedGenMethod == 'Pixel'):
+                generatedLevel=PixelGen.generate(inputImage_cv, sprites, spriteAsciiMap, pixelSize, selectedPixelMethod)
+
+            # Evaluation 1 ===========================================================================
+            # generatedLevel => (values)
+            generatedImage = Visualize.visualize(generatedLevel, spritesSMB2, spriteAsciiMap, pixelSize)
+            generatedImage.save(GenProcessString + "/" + "b_Generated.png", "PNG")
+            consistencyGen=EvaluateMC.evaluate(generatedLevel, trainedEval)
+            closenessGen=EvaluatePixel.evaluate(inputImage_pil, generatedImage)
+            levelCompareGen = EvaluateLevel.evaluate(testLevel, generatedLevel)
+
+            # Plotting ===============================================================================
+            # print("Closeness After Gen: " + str(closenessGen))
+            # print("Conisitency After Gen: " + str(consistencyGen))
+
+            # EvalFile.write(GenMethodInfostring + " Closeness After Gen: " + str(closenessGen) + "\n")
+            # EvalFile.write(GenMethodInfostring + " Conisitency After Gen: " + str(consistencyGen) + "\n")
+            # EvalFile.write(GenMethodInfostring + " LevelCheck After Gen: " + str(levelCompareGen) + "\n")
+            # EvalFile.write("\n")
+            
+            if not ("LevelCompare_" + GenMethodInfostring) in stats.keys():
+                stats["LevelCompare_" + GenMethodInfostring] = []
+            stats["LevelCompare_" + GenMethodInfostring] += [levelCompareGen]
+
             for selectedRepairMethod in repairMethods:
-                methodInfoString="Gen-" + selectedGenMethod + selectedPixelMethod + "_Rep-" + selectedRepairMethod
-                processString=(outputFolder + methodInfoString)
-                if not os.path.exists(processString):
-                    os.makedirs(processString)
-                inputImage_pil.save(processString + "/" + "a_Original_Resized.png", "PNG")
-
-                # Generate the level from the images======================================================
-                # inputImage => generatedLevel
-                generatedLevel=[]
-                if(selectedGenMethod == 'CNN'):
-                    generatedLevel=CNNGen.generate(inputImage_cv, pixelSize, spriteAsciiMap, trainedCNN, patch_width, patch_height)
-
-                if(selectedGenMethod == 'Pixel'):
-                    generatedLevel=PixelGen.generate(inputImage_cv, sprites, spriteAsciiMap, pixelSize, selectedPixelMethod)
-
-                # Evaluation 1 ===========================================================================
-                # generatedLevel => (values)
-                generatedImage=Visualize.visualize(generatedLevel, sprites, spriteAsciiMap, pixelSize)
-                generatedImage.save(processString + "/" + "b_Generated.png", "PNG")
-                consistencyGen=EvaluateMC.evaluate(generatedLevel, trainedEval)
-                closenessGen=EvaluatePixel.evaluate(inputImage_pil, generatedImage)
-                levelCompareGen=EvaluateLevel.evaluate(testLevel, generatedLevel)
+                RepMethodInfoString = GenMethodInfostring + "_Rep-" + selectedRepairMethod
+                RepProcessString = (GenProcessString + "/" + RepMethodInfoString)
+                if not os.path.exists(RepProcessString):
+                    os.makedirs(RepProcessString)
+                inputImage_pil.save(RepProcessString + "/" + "a_Original_Resized.png", "PNG")
+                generatedImage.save(RepProcessString + "/" + "b_Generated.png", "PNG")
 
                 # Repair the levels ======================================================================
                 # generatedLevel => repairedLevel
@@ -165,43 +186,29 @@ for testFile in glob.glob("./input_test_files/" + selectedCategory + "*.txt"):
 
                 # Evaluation 2 ===========================================================================
                 # repairedLevel => (values)
-                repairedImage=Visualize.visualize(repairedLevel, sprites, spriteAsciiMap, pixelSize)
-                repairedImage.save(processString + "/" + "c_Repaired.png", "PNG")
+                repairedImage = Visualize.visualize(repairedLevel, spritesSMB2, spriteAsciiMap, pixelSize)
+                repairedImage.save(RepProcessString + "/" + "c_Repaired.png", "PNG")
                 consistencyRepair=EvaluateMC.evaluate(repairedLevel, trainedEval)
                 closenessRepair=EvaluatePixel.evaluate(inputImage_pil, repairedImage)
                 levelCompareRepair=EvaluateLevel.evaluate(testLevel, repairedLevel)
 
                 # Plotting ===============================================================================
-                # print("Closeness After Gen: " + str(closenessGen))
                 # print("Closeness After Repair: " + str(closenessRepair))
-                # print("Conisitency After Gen: " + str(consistencyGen))
                 # print("Conisitency After Repair: " + str(consistencyRepair))
 
-                # EvalFile.write(methodInfoString + " Closeness After Gen: " + str(closenessGen) + "\n")
-                # EvalFile.write(methodInfoString + " Closeness After Repair: " + str(closenessRepair) + "\n")
-                # EvalFile.write(methodInfoString + " Conisitency After Gen: " + str(consistencyGen) + "\n")
-                # EvalFile.write(methodInfoString + " Conisitency After Repair: " + str(consistencyRepair) + "\n")
-                EvalFile.write(methodInfoString + " LevelCheck After Gen: " + str(levelCompareGen) + "\n")
-                EvalFile.write(methodInfoString + " LevelCheck After Repair: " + str(levelCompareRepair) + "\n")
-                EvalFile.write("\n")
+                # EvalFile.write(RepMethodInfoString + " Closeness After Repair: " + str(closenessRepair) + "\n")
+                # EvalFile.write(RepMethodInfoString + " Conisitency After Repair: " + str(consistencyRepair) + "\n")
+                # EvalFile.write(RepMethodInfoString + " LevelCheck After Repair: " + str(levelCompareRepair) + "\n")
+                # EvalFile.write("\n")
 
-                # if not ("Closeness_" + methodInfoString) in stats.keys():
-                    # stats["Closeness_" + methodInfoString] = []
-                # stats["Closeness_" + methodInfoString] += [closenessRepair]
+                if not ("LevelCompare_" + RepMethodInfoString) in stats.keys():
+                    stats["LevelCompare_" + RepMethodInfoString]=[]
+                stats["LevelCompare_" + RepMethodInfoString] += [levelCompareRepair]
 
-                # if not ("Conisitency_" + methodInfoString) in stats.keys():
-                    # stats["Conisitency_" + methodInfoString] = []
-                # stats["Conisitency_" + methodInfoString] += [consistencyRepair]
+    #EvalFile.close()
 
-                if not ("LevelCompare_" + methodInfoString) in stats.keys():
-                    stats["LevelCompare_" + methodInfoString]=[]
-                stats["LevelCompare_" + methodInfoString] += [levelCompareRepair]
-
-    EvalFile.close()
-
-outputFile=open("output_"+selectedCategory+".csv", "w")
-w=csv.writer(outputFile)
-for key, val in stats.items():
-    w.writerow([key])
-    w.writerow([val])
-outputFile.close()
+with open("output_" + selectedCategory + ".csv", 'a') as outputFile:
+    for key, val in stats.items():
+        rowStr = str(key) + ','
+        rowStr += ','.join([str(i) for i in val]) + '\n'
+        outputFile.write(rowStr)
