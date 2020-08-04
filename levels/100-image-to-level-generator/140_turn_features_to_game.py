@@ -83,6 +83,49 @@ def save_matched_game_levels(images_meta, games_data, asset_type, opts = None):
                 cv2.imwrite( output_path + asset_type+"_match_"+str(tile_size)+"px_"+images_meta['file_info']["filename_wo_extension"]+".png", cv2.vconcat(rows_of_tiles_images))
                 # if opts['output']['save_tiles'] is True:
                 #     cv2.imwrite( output_path + asset_type+"_match_"+str(tile_size)+"px_"+images_meta['file_info']["filename_wo_extension"]+"_debug_show_tilespacing.png", cv2.vconcat(rows_of_tiles_debug_images))
+
+
+
+def generate_images_from_ascii_files(opts):
+    games_data = get_compatible_games_info(opts['games_path'])
+    games_data = turn_gaming_sprites_into_histograms(games_data, opts['games_path'])
+
+    levels_meta = extract_levels_file_meta_from_path(opts['levels_path'])
+
+    for game_data in games_data:
+        if game_data['game_info']['path-friendly-name'] == 'super-mario-bros-simplified' or game_data['game_info']['path-friendly-name'] == 'super-mario-bros-sketch-avg':
+            for level_meta in levels_meta:
+                with open(level_meta['full_filename'], "r") as input_file:
+                    rows_of_tiles_images = []
+                    for line in input_file:
+                        rows_of_tiles_images.append(cv2.hconcat(list(map(lambda tChar: game_data['features']['sprites_img'][game_data['tiles'][tChar]['sprites'][0]], line.replace('\n', '')))))
+                    cv2.imwrite(level_meta['path'] + level_meta['filename_wo_extension'] + '-' + game_data['game_info']['path-friendly-name'][16:] +".png", cv2.vconcat(rows_of_tiles_images))
+
+def extract_levels_file_meta_from_path(start_path):
+
+    list_of_levels = []
+
+    # Get list of images
+    for path,dirs,files in os.walk(start_path):
+        path = path.replace('\\', '/')
+        for filename in files:
+            filename_wo_extension, extension = os.path.splitext(filename)
+            full_filename = os.path.join(path,filename).replace('\\', '/')
+            addition_from_start_path = path[len(start_path):]
+            if (addition_from_start_path != '' and addition_from_start_path[0] == '/'):
+                addition_from_start_path = addition_from_start_path[1:]
+            if extension == '.txt':
+                list_of_levels.append({
+                    "full_filename": full_filename,
+                    "filename": filename,
+                    "path": path,
+                    "filename_wo_extension": filename_wo_extension,
+                    "extension": extension,
+                    "start_path": start_path, 
+                    "addition_from_start_path": addition_from_start_path
+                })
+
+    return list_of_levels
                 
 
 def match_assets_into_game_levels(images_meta, games_data, asset_type):
@@ -218,3 +261,11 @@ def get_compatible_games_info(start_path):
 
 
     return list_of_games
+
+
+
+if __name__ == "__main__":
+    generate_images_from_ascii_files({
+        'levels_path': './generate_images_from_ascii_files/',
+        'games_path': '../../data/games',
+    })

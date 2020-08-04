@@ -103,6 +103,6 @@ repairedLevel, VidImages = Repair.Repair(brokenLevel, markovProbabilities, sprit
 repairedEval = Evaluate.evaluate(repairedLevel, markovProbabilities)
 image = Visualize.visualize(repairedLevel, sprites)
 image.save("./Repair.jpeg", "JPEG")
-VidMaker.makeVid(VidImages, 'eval', 20)
+VidMaker.makeVid(VidImages, 'eval', 40)
 
 print("Before: " + str(beforeEval) + "\nBroken: " + str(brokenEval) + "\nRepaired: " + str(repairedEval))

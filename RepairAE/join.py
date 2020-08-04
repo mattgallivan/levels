@@ -12,20 +12,17 @@ tiles = ["X", "S", "-", "?", "Q", "E", "<", ">", "[", "]", "o", "B", "b"]
 tiles_len = len(tiles)
 
 #get tensor here
-input_dir = 'chunked_data/output_tensors/'
-output_textfile_dir = 'chunked_data/output_textfiles/'
-original_dir = 'chunked_data/one hot tensors/'
-input_textfile_dir = 'chunked_data/input_textfiles/'
-file_name = 'tensor_3-1_100'
-original_file_name = 'one_hot_tensor_mario-3-1_100'
+# input_dir = 'chunked_data/output_tensors/'
+# output_textfile_dir = 'chunked_data/output_textfiles/'
+# original_dir = 'chunked_data/one hot tensors/'
+# input_textfile_dir = 'chunked_data/input_textfiles/'
+# test_file_name = 'tensor_2-1_900'
+# test_original_file_name = 'one_hot_tensor_mario-2-1_900'
 
-output_tensor = torch.load(input_dir + file_name + '.pth')
-original_tensor = torch.load(original_dir + original_file_name + '.pth')
+# output_tensor = torch.load(input_dir + test_file_name + '.pth')
+# original_tensor = torch.load(original_dir + test_original_file_name + '.pth')
 
-# print(output_tensor)
-# print(output_tensor.shape[0])
-
-def join_input(tensor, location):
+def join_input(tensor, location, file_name, save=False):
     chunk_decoded = []
 
     for vertical_iterator in range(tensor.shape[0]):
@@ -46,13 +43,14 @@ def join_input(tensor, location):
         print(i)
         print("")
 
-    with open(location + file_name + '.txt', "w") as the_file:
-        for listt in chunk_decoded:
-            for k in listt:
-                the_file.write(k)
-            the_file.write("\n")
+    if save:
+        with open(location + file_name + '.txt', "w") as the_file:
+            for listt in chunk_decoded:
+                for k in listt:
+                    the_file.write(k)
+                the_file.write("\n")
 
-def join_output(tensor, location):
+def join_output(tensor, file_path, save=False):
     chunk_decoded = []
 
     for vertical_iterator in range(tensor.shape[0]):
@@ -76,13 +74,45 @@ def join_output(tensor, location):
         print(i)
         print("")
 
-    with open(location + file_name + '.txt', "w") as the_file:
-        for listt in chunk_decoded:
-            for k in listt:
-                the_file.write(k)
-            the_file.write("\n")
+    if save: 
+        with open(file_path, "w") as the_file:
+            for listt in chunk_decoded:
+                for k in listt:
+                    the_file.write(k)
+                the_file.write("\n")
 
-print("input")
-join_input(original_tensor, input_textfile_dir)
-print("output")
-join_output(output_tensor, output_textfile_dir)
+def join_output_deterministic(tensor, file_path, save=False):
+    chunk_decoded = []
+
+    for vertical_iterator in range(tensor.shape[0]):
+        line_decoded = []
+        for horizontal_iterator in range(tensor.shape[1]):
+            for i in range(tensor.shape[2]):
+                one_hot = tensor[vertical_iterator, horizontal_iterator]
+                # if torch.max(one_hot) < 1e-3:
+                #     tile = tiles[2]
+                # else:
+                tile = tiles[torch.argmax(one_hot)]
+                # if tile == "b":
+                    # tile = "-"
+            line_decoded.append(tile)
+        chunk_decoded.append(line_decoded)
+
+    for i in chunk_decoded:
+        print(i)
+        print("")
+
+    if save:
+        with open(file_path, "w") as the_file:
+            for listt in chunk_decoded:
+                for k in listt:
+                    the_file.write(k)
+                the_file.write("\n")
+
+# print("input")
+# join_input(original_tensor, input_textfile_dir)
+# print("output")
+# join_output(output_tensor, output_textfile_dir)
+
+# output_tensor = torch.load('./PCGML3/overall_tensor_output.pth')
+# join_output_deterministic(output_tensor, './PCGML3/', 'repaired_output', save=True)
