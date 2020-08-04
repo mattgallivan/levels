@@ -95,4 +95,22 @@
         margin-bottom: 15px;
     }
 
+    .routingSection, .moreExamplesSection {
+        display: inline-block;
+        vertical-align: top;
+    }
+
+    .routingSection {
+        margin-right:40px;  
+    }
+
+    h3 {
+        margin-top: 0px;
+    }
+
+    .moreExamplesSection p {
+        margin-bottom: 6px;
+        font-size: 14px;
+    }
+
 }

@@ -93,7 +93,7 @@ def generate_images_from_ascii_files(opts):
     levels_meta = extract_levels_file_meta_from_path(opts['levels_path'])
 
     for game_data in games_data:
-        if game_data['game_info']['path-friendly-name'] == 'super-mario-bros-simplified' or game_data['game_info']['path-friendly-name'] == 'super-mario-bros-sketch':
+        if game_data['game_info']['path-friendly-name'] == 'super-mario-bros-simplified' or game_data['game_info']['path-friendly-name'] == 'super-mario-bros-sketch-avg':
             for level_meta in levels_meta:
                 with open(level_meta['full_filename'], "r") as input_file:
                     rows_of_tiles_images = []
