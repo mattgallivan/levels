@@ -1,6 +1,23 @@
 # levels
 Turning images into 2-D video game levels
 
+## HTML Server
+Quick manual setup of server
+
+```
+npm run build
+
+tmux new -s python-server
+<goto /server>
+python3 flask-server.py
+<press ctrl-b-d>
+
+tmux new -s http-server
+<goto /dist>
+http-server -c-1 -p 80
+<press ctrl-b-d>
+```
+
 ## Installation
 ```
 git clone git@github.com:mattgallivan/levels.git
